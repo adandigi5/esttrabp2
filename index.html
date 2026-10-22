@@ -673,7 +673,7 @@ function renderReview(){
 /* NUBE: Firebase Realtime Database por REST (URL + código, sin SDK) */
 const CLOUD_URL='https://esttrabp2-default-rtdb.firebaseio.com';
 const CLOUD_CODE='general'; /* código fijo: todos los dispositivos ven la misma tabla */
-const APP_VER='v3-nube-fija';
+const APP_VER='v4-sync-inmediata';
 const Cloud={
   cfg:null,poll:null,
   load(){
@@ -691,6 +691,7 @@ const Cloud={
   url(path,cfg){cfg=cfg||this.cfg;const i=path.indexOf('?'),p=i<0?path:path.slice(0,i),qs=i<0?'':path.slice(i);return cfg.url+'/scores/'+encodeURIComponent(cfg.key+'__'+QUIZ_ID)+p+'.json'+qs},
   async call(method,path,body,cfg){
     const opt={method};
+    if(method!=='GET')opt.keepalive=true;
     if(body!==undefined){opt.headers={'Content-Type':'application/json'};opt.body=JSON.stringify(body)}
     const r=await fetch(this.url(path,cfg),opt);
     if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e}
@@ -713,10 +714,23 @@ const Track={
       try{
         const d=await Cloud.call('GET','');
         this.items=d?Object.entries(d).filter(([k,v])=>v&&typeof v==='object').map(([k,v])=>Object.assign({key:k},v)):[];
+        this.mergeOwn();
         this.lastSync=new Date();this.err=false;
       }catch(e){this.err=true}
     }else{this.items=this.lget()}
     this.renderAll();
+  },
+  mergeOwn(){
+    if(!this.rec||!this.key||this.mode!=='cloud')return;
+    const k=this.key,r=Object.assign({key:k},this.rec),i=this.items.findIndex(x=>x.key===k);
+    if(i<0)this.items.push(r);
+    else if((this.items[i].updatedAt||0)<(r.updatedAt||0))this.items[i]=r;
+  },
+  async push(key,rec){
+    for(let t=1;;t++){
+      try{return await Cloud.call('PUT','/'+key,rec)}
+      catch(e){if(t>=3)throw e;await new Promise(r=>setTimeout(r,800*t))}
+    }
   },
   begin(startedAt,total){
     this.discardIfEmpty();
@@ -726,11 +740,12 @@ const Track={
     this.save();
   },
   patch(p){if(!this.rec)return;Object.assign(this.rec,p,{updatedAt:Date.now()});this.save()},
-  finish(){this.patch({score:S.score,answered:S.log.length,finished:true,finishedAt:Date.now()})},
+  finish(){this.patch({score:S.score,answered:S.log.length,finished:true,finishedAt:Date.now()});this.startPoll()},
   save(){
     const rec=Object.assign({},this.rec),key=this.key;
     if(this.mode==='cloud'){
-      this.q=this.q.then(()=>Cloud.call('PUT','/'+key,rec)).then(()=>{this.err=false;return this.refresh()}).catch(()=>{this.err=true;this.renderAll()});
+      this.mergeOwn();this.renderAll();
+      this.q=this.q.then(()=>this.push(key,rec)).then(()=>{this.err=false;return this.refresh()}).catch(()=>{this.err=true;this.renderAll()});
     }else{
       const a=this.lget(),i=a.findIndex(x=>x.key===key),it=Object.assign({key},rec);
       if(i>=0)a[i]=it;else a.push(it);
