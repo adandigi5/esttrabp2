@@ -294,15 +294,15 @@ h1{font-size:clamp(1.3rem,5.6vw,1.8rem)}
 <div class="ov" id="cloudOv">
 <div class="modal card wide">
 <h2 class="mh">Guardar en la nube</h2>
-<p class="mp">Los puntajes se sincronizan automáticamente con la base de datos. Si querés una tabla privada, cambiá el código (usá el mismo en cada dispositivo).</p>
+<p class="mp">Los puntajes se sincronizan automáticamente con la base de datos. No tenés que configurar nada.</p>
 <input class="name-in" id="cloudUrl" type="hidden" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="https://tu-proyecto-default-rtdb.firebaseio.com">
-<label class="lbl2" for="cloudCode">Código</label>
-<input class="name-in" id="cloudCode" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Elegí un código">
+<label class="lbl2" for="cloudCode" style="display:none">Código</label>
+<input class="name-in" id="cloudCode" type="hidden" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Elegí un código">
 <div class="tstat" id="cloudStatus"></div>
 <div class="row">
 <button class="btn" id="cloudClose">Cerrar</button>
 <button class="btn" id="cloudOff" style="display:none">Desconectar</button>
-<button class="btn primary" id="cloudOk">Conectar</button>
+<button class="btn primary" id="cloudOk">Reintentar conexión</button>
 </div>
 </div>
 </div>
@@ -672,14 +672,13 @@ function renderReview(){
 
 /* NUBE: Firebase Realtime Database por REST (URL + código, sin SDK) */
 const CLOUD_URL='https://esttrabp2-default-rtdb.firebaseio.com';
-const CLOUD_CODE='general'; /* código compartido: todos los dispositivos ven la misma tabla */
+const CLOUD_CODE='general'; /* código fijo: todos los dispositivos ven la misma tabla */
+const APP_VER='v3-nube-fija';
 const Cloud={
   cfg:null,poll:null,
   load(){
-    let sv=null;try{sv=JSON.parse(LS.get('quizCloud','null'))}catch(e){}
-    if(sv&&sv.off){this.cfg=null;return}
-    const code=(sv&&sv.code)||CLOUD_CODE;
-    this.cfg={url:CLOUD_URL,code,key:this.key(code)};
+    LS.del('quizCloud');
+    this.cfg={url:CLOUD_URL,code:CLOUD_CODE,key:this.key(CLOUD_CODE)};
   },
   on(){return !!(this.cfg&&this.cfg.url&&this.cfg.key)},
   norm(u){
@@ -752,7 +751,7 @@ const Track={
   tableHTML(){
     const fmt=o=>new Date(o.t).toLocaleString('es-AR',o.o);
     let st;
-    if(Cloud.on())st=this.err?'No se pudo sincronizar. Reintentando…':'Sincronizado con la nube'+(this.lastSync?' · '+this.lastSync.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}):'')+'.';
+    if(Cloud.on())st=this.err?'No se pudo sincronizar. Reintentando…':'Sincronizado con la nube ('+APP_VER+')'+(this.lastSync?' · '+this.lastSync.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}):'')+'.';
     else st='Solo en este dispositivo. Tocá el ícono de nube para volver a conectar.';
     let h='<div class="tstat">'+esc(st)+'</div>';
     const top=this.top();
@@ -849,23 +848,23 @@ function confirmName(){
 function cloudStatus(t){$('#cloudStatus').textContent=t}
 function openCloud(){
   $('#cloudUrl').value=CLOUD_URL;
-  $('#cloudCode').value=Cloud.cfg?Cloud.cfg.code:CLOUD_CODE;
-  $('#cloudOff').style.display=Cloud.on()?'':'none';
-  cloudStatus(Cloud.on()?'Conectado. Tus puntajes se sincronizan con este código.':'Desconectado. Los puntajes se guardan solo en este dispositivo.');
+  $('#cloudCode').value=CLOUD_CODE;
+  $('#cloudOff').style.display='none';
+  cloudStatus('Sincronización automática activada ('+APP_VER+').');
   openOv('#cloudOv');
 }
 async function connectCloud(){
-  const url=CLOUD_URL,code=$('#cloudCode').value.trim(),key=Cloud.key(code);
+  const url=CLOUD_URL,code=CLOUD_CODE,key=Cloud.key(code);
   if(!url){cloudStatus('Pegá una URL válida que empiece con https://');return}
   if(!key){cloudStatus('Elegí un código.');return}
   const cfg={url,code,key};
   cloudStatus('Conectando…');$('#cloudOk').disabled=true;
   try{
     await Cloud.call('GET','?shallow=true',undefined,cfg);
-    Cloud.cfg=cfg;LS.set('quizCloud',JSON.stringify(cfg));
+    Cloud.cfg=cfg;
     Track.startPoll();await Track.refresh();
-    $('#cloudOff').style.display='';$('#cloudBtn').classList.add('on');
-    cloudStatus('Conectado. Tus puntajes se sincronizan con este código.');
+    $('#cloudBtn').classList.add('on');
+    cloudStatus('Conectado. Tus puntajes se sincronizan automáticamente.');
   }catch(e){
     cloudStatus(e.status===401||e.status===403?'Permiso denegado. Revisá las reglas de la base de datos.':e.status===404?'No se encontró la base. Revisá la URL.':'No se pudo conectar. Revisá la URL y tu conexión.');
   }
