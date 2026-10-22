@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Quiz: Estudio del Trabajo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{
+--bg:#FFFFFF;--surface:#F4F3FA;--surface-fixed:#E6E3F2;--border:#202030;--text:#202030;--text-muted:#5E5E6A;
+--accent:#4737FF;--on-accent:#FFFFFF;--accent-soft:#D1CDFF;--ok:#A5E635;--ok-soft:#CDF28A;--ok-edge:#5E9A0C;
+--bad:#F94500;--bad-soft:#FFC2A6;--ink:#202030;--accent-ink:#4737FF;--on-ok-soft:#202030;--overlay:rgba(16,16,24,.55);
+}
+[data-theme="dark"]{
+--bg:#101018;--surface:#202030;--surface-fixed:#181826;--border:#5E5E6A;--text:#FFFFFF;--text-muted:#D1CDFF;
+--accent:#4737FF;--on-accent:#FFFFFF;--accent-soft:#ACA5FF;--ok:#B9F55A;--ok-soft:#2A3318;--ok-edge:#B9F55A;
+--bad:#F94500;--bad-soft:rgba(249,69,0,.14);--ink:#202030;--accent-ink:#ACA5FF;--on-ok-soft:#FFFFFF;--overlay:rgba(0,0,0,.65);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);
+transition:background .25s,color .25s;overflow-x:hidden;-webkit-text-size-adjust:100%}
+button{font-family:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+button:focus-visible,summary:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tx{font-variant-emoji:text}
+.screen{display:none}
+.screen.active{display:flex}
+.card{background:var(--surface);border:2px solid var(--border);border-bottom-width:4px;border-radius:18px;
+transition:background .25s,color .25s,border-color .25s}
+.btn{min-height:44px;padding:.55rem 1rem;border-radius:13px;border:2px solid var(--border);border-bottom-width:4px;
+background:var(--surface);font-weight:700;font-size:clamp(.88rem,3.6vw,1rem);transition:background .2s,color .2s}
+.btn:active{transform:translateY(2px);border-bottom-width:2px}
+.btn.primary{background:var(--accent);color:var(--on-accent)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.icon-btn{width:40px;height:40px;min-width:40px;border-radius:50%;border:2px solid var(--border);border-bottom-width:4px;
+background:var(--surface);display:grid;place-items:center;font-size:1.05rem;font-weight:700;line-height:1}
+.icon-btn.on{background:var(--accent-soft);color:var(--ink)}
+/* HOME */
+#home{height:100dvh;overflow:hidden;flex-direction:column;align-items:center;
+padding:max(.6rem,env(safe-area-inset-top)) max(.7rem,env(safe-area-inset-right)) max(.6rem,env(safe-area-inset-bottom)) max(.7rem,env(safe-area-inset-left))}
+.home-in{width:100%;max-width:720px;height:100%;display:flex;flex-direction:column;gap:.55rem;min-height:0}
+.head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.35rem .6rem;flex-shrink:0}
+.head h1{flex:1 1 11rem;min-width:0}
+.hbtns{display:flex;gap:.4rem;flex-shrink:0;margin-left:auto}
+h1{font-weight:800;font-size:clamp(1.55rem,6.8vw,2.3rem);line-height:1.15}
+.units-card{padding:.6rem;display:flex;flex-direction:column;gap:.5rem;min-height:0;flex:1}
+.units-top{display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-shrink:0}
+.units-list{overflow-y:auto;display:flex;flex-direction:column;gap:.4rem;min-height:0;flex:1}
+.unit{display:flex;align-items:center;gap:.65rem;min-height:44px;padding:.4rem .7rem;border-radius:13px;
+border:2px solid var(--border);border-bottom-width:4px;background:var(--bg);text-align:left;width:100%;font-size:clamp(.88rem,3.6vw,1rem)}
+.unit .n{margin-left:auto;font-size:.8rem;color:var(--text-muted);white-space:nowrap}
+.unit.on{background:var(--accent-soft);color:var(--ink)}
+.unit.on .n{color:var(--ink)}
+.box{width:22px;height:22px;flex:none;border:2px solid var(--border);border-radius:6px;display:grid;place-items:center;font-size:.85rem;font-weight:800}
+.unit.on .box{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.counts{padding:.5rem;display:flex;gap:.4rem;flex-shrink:0;align-items:center}
+.counts .lbl{font-size:.8rem;color:var(--text-muted);font-weight:700;padding:0 .3rem}
+.cnt{flex:1;min-height:44px;border-radius:12px;border:2px solid var(--border);border-bottom-width:4px;background:var(--bg);font-weight:700}
+.cnt.on{background:var(--accent);color:var(--on-accent)}
+.toggles{display:flex;gap:.5rem;flex-shrink:0}
+.tgl{flex:1 1 50%;display:flex;align-items:center;justify-content:space-between;gap:.4rem;min-height:52px;padding:.4rem .6rem;
+background:var(--surface);border:2px solid var(--border);border-bottom-width:4px;border-radius:16px;text-align:left;font-weight:700;font-size:clamp(.74rem,3.1vw,.92rem);line-height:1.2}
+.sw{width:42px;height:24px;flex:none;border-radius:999px;background:var(--text-muted);position:relative;transition:background .2s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--on-accent);transition:transform .2s}
+.sw.on{background:var(--accent)}
+.sw.on::after{transform:translateX(18px)}
+#startBtn{flex-shrink:0;min-height:52px;font-size:clamp(1rem,4.2vw,1.15rem)}
+/* QUIZ */
+#quiz{height:100dvh;overflow:hidden;justify-content:center}
+.qc{width:100%;max-width:720px;height:100%;display:flex;flex-direction:column;gap:.45rem;min-height:0;
+padding:max(.5rem,env(safe-area-inset-top)) max(.6rem,env(safe-area-inset-right)) max(.4rem,env(safe-area-inset-bottom)) max(.6rem,env(safe-area-inset-left))}
+.topbar{flex-shrink:0;background:var(--surface-fixed);padding:.5rem .6rem;display:flex;flex-direction:column;gap:.45rem;position:relative}
+.prog{height:10px;border-radius:999px;background:var(--surface);border:2px solid var(--border);overflow:hidden}
+.prog>i{display:block;height:100%;width:0;background:var(--accent);transition:width .35s}
+.trow{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.tl{display:flex;align-items:center;gap:.5rem;font-weight:800}
+.badge{padding:.2rem .65rem;border-radius:999px;background:var(--accent-soft);color:var(--ink);font-weight:800;font-size:.9rem;border:2px solid var(--border)}
+.tr{display:flex;gap:.5rem}
+.menu{position:absolute;right:.5rem;top:calc(100% + 6px);z-index:30;min-width:230px;max-width:calc(100vw - 1.4rem);background:var(--surface);
+border:2px solid var(--border);border-bottom-width:4px;border-radius:16px;padding:.4rem;display:none;flex-direction:column;gap:.3rem}
+.menu.open{display:flex}
+.mi{display:flex;align-items:center;justify-content:space-between;gap:.6rem;min-height:44px;padding:.3rem .7rem;border-radius:12px;border:2px solid var(--border);
+background:var(--bg);font-weight:700;text-align:left;width:100%;font-size:.92rem}
+.qbox{flex-shrink:0;background:var(--surface-fixed);padding:.6rem .8rem;display:flex;flex-direction:column;gap:.3rem}
+.ulabel{color:var(--accent-ink);font-weight:800;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+.qtext{font-weight:700;font-size:clamp(.95rem,3.9vw,1.2rem);line-height:1.3;overflow-wrap:anywhere}
+.mhint{font-size:.78rem;color:var(--text-muted);font-weight:600}
+.quiz-scroll-area{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:.45rem;padding:.1rem .1rem .2rem}
+.opt{display:flex;align-items:center;gap:.65rem;width:100%;min-height:44px;padding:.55rem .75rem;text-align:left;border-radius:13px;
+border:2px solid var(--border);border-bottom-width:4px;background:var(--surface);font-size:clamp(.88rem,3.6vw,1rem);line-height:1.3;overflow-wrap:anywhere;transition:background .15s}
+.opt .t{flex:1;min-width:0}
+.mark{width:22px;height:22px;flex:none;border:2px solid var(--border);border-radius:50%;display:grid;place-items:center}
+.opt.multi .mark{border-radius:6px}
+.mark::after{content:"";width:10px;height:10px;border-radius:50%;background:transparent}
+.opt.multi .mark::after{border-radius:3px}
+.opt.sel{background:var(--accent-soft);color:var(--ink)}
+.opt.sel .mark::after{background:var(--accent)}
+.opt.ok{background:var(--ok);border-color:var(--ok-edge);color:var(--ink)}
+.opt.ok .mark{border-color:var(--ink)}
+.opt.ok .mark::after{background:var(--ink)}
+.opt.okfade{background:var(--ok-soft);border-color:var(--ok-edge);color:var(--on-ok-soft)}
+.opt.bad{background:var(--bad);color:var(--on-accent);border-color:var(--bad)}
+.opt.bad .mark{border-color:var(--on-accent)}
+.opt.bad .mark::after{background:var(--on-accent)}
+.opt:disabled{cursor:default}
+.fb{border-radius:16px;border:2px solid var(--border);border-bottom-width:4px;padding:.6rem .8rem;font-size:clamp(.88rem,3.5vw,.98rem);overflow-wrap:anywhere}
+.fb.ok{background:var(--ok-soft);border-color:var(--ok-edge);color:var(--on-ok-soft)}
+.fb.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--text)}
+.fb b{font-weight:800}
+.fb .exp{margin-top:.4rem;font-size:.86rem;opacity:.95;padding-top:.4rem;border-top:2px dashed var(--border)}
+.cd{display:block;margin-top:.25rem;font-size:.8rem;opacity:.8}
+.bar{flex-shrink:0;background:var(--surface-fixed);padding:.5rem .6rem;display:none;border-radius:18px;border:2px solid var(--border);border-bottom-width:4px;padding-bottom:max(.5rem,env(safe-area-inset-bottom))}
+.bar.show{display:block}
+.bar .btn{width:100%;min-height:48px}
+/* RESULTS */
+#results{min-height:100dvh;justify-content:center;align-items:flex-start;
+padding:max(.8rem,env(safe-area-inset-top)) max(.8rem,env(safe-area-inset-right)) max(1rem,env(safe-area-inset-bottom)) max(.8rem,env(safe-area-inset-left))}
+.res-in{width:100%;max-width:720px;display:flex;flex-direction:column;gap:.8rem}
+.res-top{display:flex;justify-content:flex-end;gap:.4rem}
+.final{padding:1.6rem 1rem;text-align:center;font-weight:800;font-size:clamp(1.3rem,6vw,1.9rem)}
+.res-btns{display:flex;gap:.6rem}
+.res-btns .btn{flex:1}
+.coll>summary{list-style:none;cursor:pointer;min-height:48px;display:flex;align-items:center;justify-content:space-between;gap:.6rem;padding:.6rem .9rem;font-weight:800;font-size:1.1rem}
+.coll>summary::-webkit-details-marker{display:none}
+.chev{width:10px;height:10px;flex:none;border-right:3px solid currentColor;border-bottom:3px solid currentColor;transform:rotate(45deg);margin:0 .3rem 4px 0;transition:transform .2s}
+.coll[open]>summary .chev{transform:rotate(-135deg);margin:4px .3rem 0 0}
+.coll-in{padding:0 .8rem .8rem;display:flex;flex-direction:column;gap:.6rem}
+.tabs{display:flex;gap:.4rem}
+.tab{flex:1;min-height:44px;padding:.3rem .4rem;border-radius:12px;border:2px solid var(--border);border-bottom-width:4px;background:var(--surface);font-weight:700;font-size:clamp(.78rem,3.3vw,.95rem)}
+.tab.on{background:var(--accent);color:var(--on-accent)}
+.rev{padding:.75rem .9rem;border-left:8px solid var(--ok-edge);display:flex;flex-direction:column;gap:.4rem;overflow-wrap:anywhere}
+.rev.bad{border-left-color:var(--bad)}
+.rev .rq{font-weight:700}
+.rev .ro{display:flex;gap:.45rem;font-size:.92rem;padding:.3rem .5rem;border-radius:10px}
+.rev .ro.ok{background:var(--ok-soft);color:var(--on-ok-soft)}
+.rev .ro.bad{background:var(--bad-soft)}
+.rev .ro.miss{background:var(--surface-fixed);border:2px dashed var(--ok-edge)}
+.rev .rx{font-size:.86rem;color:var(--text-muted)}
+/* TABLA DE PUNTAJES */
+.tstat{font-size:.8rem;color:var(--text-muted);font-weight:600;overflow-wrap:anywhere}
+.tlist{display:flex;flex-direction:column;gap:.4rem}
+.trk{display:grid;grid-template-columns:auto 1fr auto;align-items:center;column-gap:.6rem;padding:.5rem .7rem;border-radius:13px;border:2px solid var(--border);border-bottom-width:4px;background:var(--bg)}
+.trk.me{background:var(--accent-soft);color:var(--ink)}
+.rk{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:.9rem;background:var(--surface-fixed);border:2px solid var(--border);color:var(--text)}
+.trk.me .rk{background:var(--bg);color:var(--text)}
+.tmid{min-width:0}
+.trk .tn{font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trk .td{font-size:.78rem;color:var(--text-muted)}
+.trk.me .td{color:var(--ink)}
+.trk .ts{white-space:nowrap;font-size:.82rem}
+/* MODALES */
+.ov{position:fixed;inset:0;background:var(--overlay);display:none;align-items:center;justify-content:center;z-index:50;padding:1rem}
+.ov.open{display:flex}
+.modal{width:100%;max-width:380px;max-height:90dvh;overflow-y:auto;padding:1.2rem;display:flex;flex-direction:column;gap:.8rem;background:var(--surface)}
+.modal.wide{max-width:460px}
+.modal p{font-weight:700;line-height:1.35}
+.modal .mp{font-weight:500;color:var(--text-muted);font-size:.92rem}
+.modal .mh{font-weight:800;font-size:1.5rem;line-height:1.2}
+.modal .row{display:flex;gap:.6rem;flex-wrap:wrap}
+.modal .row .btn{flex:1;min-width:110px}
+.mhead{display:flex;align-items:center;justify-content:space-between;gap:.6rem}
+.lbl2{font-size:.92rem;color:var(--text-muted);font-weight:600;margin-bottom:-.4rem}
+.name-in{width:100%;min-height:50px;padding:.5rem .9rem;border-radius:14px;border:2px solid var(--border);border-bottom-width:4px;background:var(--bg);color:var(--text);font-family:inherit;font-size:1rem}
+.name-in:focus{outline:3px solid var(--accent);outline-offset:2px}
+.pr{display:flex;gap:.6rem}
+.pr>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:.35rem}
+input[type=color].pick{width:100%;min-height:50px;padding:3px;border:2px solid var(--border);border-bottom-width:4px;border-radius:14px;background:var(--bg);cursor:pointer}
+.pH{display:flex;gap:.6rem}
+.pw{flex:1 1 0;display:flex;padding:0;min-height:48px;overflow:hidden;border-radius:13px;border:2px solid var(--border);border-bottom-width:4px;background:var(--surface)}
+.pw i{flex:1;display:block}
+.pw.cur{outline:3px solid var(--accent);outline-offset:2px}
+@media (min-width:600px){
+.home-in,.res-in{gap:.8rem}
+.units-card{padding:.9rem}
+.opt{padding:.7rem 1rem}
+}
+@media (max-height:640px){
+h1{font-size:clamp(1.3rem,5.6vw,1.8rem)}
+}
+</style>
+</head>
+<body>
+
+<section id="home" class="screen active">
+<div class="home-in">
+<div class="head">
+<h1>Quiz: Estudio del Trabajo</h1>
+<div class="hbtns">
+<button class="icon-btn" id="cloudBtn" aria-label="Guardar en la nube"><i class="ti ti-cloud"></i></button>
+<button class="icon-btn" id="rankBtn" aria-label="Tabla de puntajes">#</button>
+<button class="icon-btn palOpen" aria-label="Colores"><i class="ti ti-palette"></i></button>
+<button class="icon-btn tx themeBtn" aria-label="Cambiar tema"></button>
+</div>
+</div>
+<div class="card units-card">
+<div class="units-top">
+<button class="btn" id="allBtn"></button>
+</div>
+<div class="units-list" id="unitsList"></div>
+</div>
+<div class="card counts" id="counts"></div>
+<div class="toggles">
+<button class="tgl" data-toggle="showExplanations" role="switch"><span class="tx">⚯&#xFE0E; Mostrar explicaciones</span><span class="sw" data-sw="showExplanations"></span></button>
+<button class="tgl" data-toggle="autoAdvance" role="switch"><span class="tx">⏭&#xFE0E; Auto-avance en aciertos</span><span class="sw" data-sw="autoAdvance"></span></button>
+</div>
+<button class="btn primary tx" id="startBtn">▶&#xFE0E; Comenzar quiz</button>
+</div>
+</section>
+
+<section id="quiz" class="screen">
+<div class="qc">
+<div class="topbar card">
+<div class="prog"><i id="progBar"></i></div>
+<div class="trow">
+<div class="tl"><span id="counter">1/1</span><span class="badge tx" id="score">★&#xFE0E; 0</span></div>
+<div class="tr">
+<button class="icon-btn tx" id="setBtn" aria-label="Ajustes">⏣</button>
+<button class="icon-btn tx" id="menuBtn" aria-label="Menú">⫶☰</button>
+</div>
+</div>
+<div class="menu" id="setMenu">
+<button class="mi tx" id="themeItem"></button>
+<button class="mi palOpen"><span>Colores</span><i class="ti ti-palette"></i></button>
+<button class="mi" data-toggle="showExplanations" role="switch"><span class="tx">⚯&#xFE0E; Mostrar explicaciones</span><span class="sw" data-sw="showExplanations"></span></button>
+<button class="mi" data-toggle="autoAdvance" role="switch"><span class="tx">⏭&#xFE0E; Auto-avance en aciertos</span><span class="sw" data-sw="autoAdvance"></span></button>
+</div>
+<div class="menu" id="mainMenu">
+<button class="mi tx" id="scoresItem">★&#xFE0E; Tabla de puntajes</button>
+<button class="mi tx" id="restartItem">↺ Reiniciar cuestionario</button>
+<button class="mi tx" id="homeItem">🏠&#xFE0E; Menú inicial</button>
+</div>
+</div>
+<div class="qbox card">
+<div class="ulabel" id="uLabel"></div>
+<div class="qtext" id="qText"></div>
+<div class="mhint" id="mHint"></div>
+</div>
+<div class="quiz-scroll-area" id="scrollArea">
+<div id="opts" style="display:flex;flex-direction:column;gap:.45rem"></div>
+<div id="fbWrap"></div>
+</div>
+<div class="bar" id="bar"><button class="btn primary tx" id="mainBtn"></button></div>
+</div>
+</section>
+
+<section id="results" class="screen">
+<div class="res-in">
+<div class="res-top"><button class="icon-btn palOpen" aria-label="Colores"><i class="ti ti-palette"></i></button><button class="icon-btn tx themeBtn" aria-label="Cambiar tema"></button></div>
+<div class="card final" id="final"></div>
+<div class="res-btns">
+<button class="btn primary" id="repeatBtn">Repetir quiz</button>
+<button class="btn" id="newBtn">Nuevo quiz</button>
+</div>
+<details class="card coll" id="revBox">
+<summary><span class="tx">🔍&#xFE0E; Revisión completa</span><span class="chev"></span></summary>
+<div class="coll-in">
+<div class="tabs" id="tabs">
+<button class="tab on" data-f="all">Todas</button>
+<button class="tab" data-f="ok">0 correctas</button>
+<button class="tab" data-f="bad">0 incorrectas</button>
+</div>
+<div id="revList" style="display:flex;flex-direction:column;gap:.6rem"></div>
+</div>
+</details>
+<details class="card coll" id="tblBox">
+<summary><span class="tx">★&#xFE0E; Tabla de puntajes</span><span class="chev"></span></summary>
+<div class="coll-in" id="resTable"></div>
+</details>
+</div>
+</section>
+
+<div class="ov" id="ov">
+<div class="modal card">
+<p id="modalMsg"></p>
+<div class="row">
+<button class="btn" id="mCancel">Cancelar</button>
+<button class="btn primary" id="mOk">Confirmar</button>
+</div>
+</div>
+</div>
+
+<div class="ov" id="nameOv">
+<div class="modal card wide">
+<h2 class="mh">Tu nombre</h2>
+<p class="mp">Ingresalo para que aparezca en la tabla de puntajes.</p>
+<input class="name-in" id="nameIn" type="text" maxlength="40" autocomplete="name" placeholder="Escribí tu nombre">
+<div class="row">
+<button class="btn" id="nameCancel">Cancelar</button>
+<button class="btn primary tx" id="nameOk">▶&#xFE0E; Comenzar</button>
+</div>
+</div>
+</div>
+
+<div class="ov" id="cloudOv">
+<div class="modal card wide">
+<h2 class="mh">Guardar en la nube</h2>
+<p class="mp">Los puntajes se sincronizan automáticamente con la base de datos. Si querés una tabla privada, cambiá el código (usá el mismo en cada dispositivo).</p>
+<input class="name-in" id="cloudUrl" type="hidden" inputmode="url" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="https://tu-proyecto-default-rtdb.firebaseio.com">
+<label class="lbl2" for="cloudCode">Código</label>
+<input class="name-in" id="cloudCode" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="Elegí un código">
+<div class="tstat" id="cloudStatus"></div>
+<div class="row">
+<button class="btn" id="cloudClose">Cerrar</button>
+<button class="btn" id="cloudOff" style="display:none">Desconectar</button>
+<button class="btn primary" id="cloudOk">Conectar</button>
+</div>
+</div>
+</div>
+
+<div class="ov" id="palOv">
+<div class="modal card wide">
+<div class="mhead">
+<h2 class="mh">Colores</h2>
+<button class="icon-btn tx" id="palClose" aria-label="Cerrar">✕&#xFE0E;</button>
+</div>
+<p class="mp">Elegí los dos colores principales del cuestionario.</p>
+<div class="pr">
+<div><label class="lbl2" for="palA">Acento</label><input class="pick" type="color" id="palA" aria-label="Color de acento"></div>
+<div><label class="lbl2" for="palB">Base</label><input class="pick" type="color" id="palB" aria-label="Color base"></div>
+</div>
+<div class="tstat">El color base se oscurece solo si es muy claro, para que el texto se siga leyendo bien.</div>
+<button class="btn primary" id="palOk">Aplicar</button>
+<div class="lbl2" style="margin-bottom:0">Últimas combinaciones</div>
+<div id="palHist"></div>
+<div class="tstat" id="palStatus"></div>
+<button class="btn" id="palReset">Restaurar original</button>
+</div>
+</div>
+
+<div class="ov" id="scoreOv">
+<div class="modal card wide">
+<div class="mhead">
+<h2 class="mh tx">★&#xFE0E; Tabla de puntajes</h2>
+<button class="icon-btn tx" id="scoreClose" aria-label="Cerrar">✕&#xFE0E;</button>
+</div>
+<div class="coll-in" id="qzTable" style="padding:0"></div>
+</div>
+</div>
+
+<script>
+const QUESTIONS = [
+// >>> PEGAR AQUÍ LAS PREGUNTAS Y RESPUESTAS (formato {u,q,opts,a,exp}) <<<
+{u:"Distribución en planta: objetivos y principios",q:"¿Qué es la distribución en planta según el material?",opts:["El plan de mantenimiento preventivo de los equipos de producción", "La asignación de tareas a los operarios según su calificación", "La programación de los tiempos de fabricación de cada puesto de trabajo", "El orden físico de los elementos industriales: espacios, equipos y personas"],a:[3],exp:{ok:"Es la organización física de espacios, equipos y personas para producir de manera económica, segura y eficiente.",wrong:"Programar tiempos, mantener equipos o asignar tareas son actividades de gestión; la distribución se refiere al ordenamiento físico."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Cuál es el objetivo principal de la distribución en planta?",opts:["Lograr una disposición económica para el proceso, segura y satisfactoria para los trabajadores", "Reducir la cantidad de productos que se fabrican en cada lote", "Maximizar la producción diaria sin considerar la seguridad del personal", "Ocupar la menor superficie posible aunque empeoren las condiciones de trabajo"],a:[0],exp:{ok:"El objetivo central combina economía del proceso con seguridad y satisfacción de los trabajadores.",wrong:"Ahorrar superficie es solo uno de los objetivos secundarios; producir más a costa de la seguridad contradice el objetivo principal."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Cuáles de estos son objetivos de una buena distribución en planta? Marcá todas las correctas.",opts:["Reducir los riesgos para la salud y aumentar la seguridad", "Disminuir retrasos y tiempos de fabricación", "Reducir el material en proceso", "Aumentar los recorridos para controlar mejor a los operarios", "Incrementar el inventario en proceso para evitar paradas"],a:[0, 1, 2],exp:{ok:"Seguridad, menores tiempos de fabricación y menos material en proceso figuran entre los objetivos.",wrong:"Aumentar recorridos o inventario en proceso va en contra de los objetivos: se busca evitar recorridos innecesarios y reducir el material en proceso."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Cuál de estas opciones enumera los seis principios de una distribución eficaz?",opts:["Integración de conjunto, mínimo inventario, flujo de materiales, espacio cúbico, satisfacción y estandarización", "Mínima distancia recorrida, balanceo de línea, flujo de materiales, espacio cúbico, flexibilidad y automatización", "Integración de conjunto, mínima distancia recorrida, flujo de materiales, espacio cúbico, satisfacción y seguridad, y flexibilidad", "Integración de conjunto, máxima ocupación del piso, flujo de materiales, espacio cúbico, seguridad y especialización"],a:[2],exp:{ok:"Esos son los seis principios complementarios que presenta el material.",wrong:"Las otras listas reemplazan principios reales por conceptos que suenan parecidos (ocupación del piso, balanceo, automatización, estandarización)."}},
+{u:"Distribución en planta: objetivos y principios",q:"Producción, mantenimiento, control de calidad y depósito se ubican de manera que puedan trabajar sin interferirse. ¿Qué principio se aplica?",opts:["Flexibilidad", "Aprovechamiento del espacio cúbico", "Mínima distancia recorrida", "Integración de conjunto"],a:[3],exp:{ok:"La integración de conjunto coordina todos los elementos que intervienen en la producción.",wrong:"Los otros principios se refieren a desplazamientos, cambios futuros o uso de la altura, no a la coordinación entre sectores."}},
+{u:"Distribución en planta: objetivos y principios",q:"Acercar la materia prima al primer puesto de trabajo evita traslados que no agregan valor. ¿Qué principio ilustra?",opts:["Circulación o flujo de materiales", "Integración de conjunto", "Mínima distancia recorrida", "Satisfacción y seguridad"],a:[2],exp:{ok:"Reducir los desplazamientos de materiales, personas y equipos es el principio de mínima distancia recorrida.",wrong:"El flujo de materiales trata de la secuencia lógica del proceso; aquí el foco está en acortar un traslado."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Qué exige el principio de circulación o flujo de materiales?",opts:["Que cada sector fabrique sus propios materiales de forma independiente", "Que todos los materiales se almacenen en un único depósito central", "Una secuencia lógica y continua del proceso, sin retrocesos", "Que los materiales recorran la mayor cantidad posible de sectores"],a:[2],exp:{ok:"El proceso debe seguir una secuencia lógica, continua y sin retrocesos.",wrong:"Centralizar el almacenamiento, alargar recorridos o independizar sectores no garantizan una secuencia sin retrocesos."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Cuál de estos recorridos es coherente con el principio de flujo de materiales?",opts:["Recepción → corte → mecanizado → armado → control → embalaje", "Mecanizado → recepción → control → corte → embalaje → armado", "Recepción → armado → corte → control → mecanizado → embalaje", "Corte → recepción → embalaje → mecanizado → armado → control"],a:[0],exp:{ok:"Es una secuencia lógica y continua desde la recepción hasta el embalaje.",wrong:"Las demás alteran el orden natural (armar antes de cortar, embalar antes de controlar) y obligan a retrocesos."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Qué implica el aprovechamiento del espacio cúbico?",opts:["Utilizar solo la superficie del piso para facilitar la circulación del personal", "Usar la superficie del piso y la altura disponible, por ejemplo con estanterías seguras", "Reducir la altura de los equipos para ahorrar costos de instalación", "Almacenar en altura sin considerar la seguridad de los trabajadores"],a:[1],exp:{ok:"Se aprovecha tanto el piso como la altura, siempre que sea seguro y adecuado.",wrong:"Usar solo el piso desaprovecha la altura y almacenar sin seguridad contradice otro principio de la distribución."}},
+{u:"Distribución en planta: objetivos y principios",q:"Separar los pasillos peatonales de las rutas de autoelevadores responde al principio de:",opts:["Integración de conjunto", "Flexibilidad", "Satisfacción y seguridad", "Mínima distancia recorrida"],a:[2],exp:{ok:"Crear condiciones cómodas y seguras es el principio de satisfacción y seguridad.",wrong:"Los demás principios apuntan a adaptación, distancias o coordinación entre sectores."}},
+{u:"Distribución en planta: objetivos y principios",q:"Los puestos modulares y los equipos reubicables facilitan principalmente el principio de:",opts:["Integración de conjunto", "Flexibilidad", "Circulación o flujo de materiales", "Aprovechamiento del espacio cúbico"],a:[1],exp:{ok:"Permiten adaptarse con relativa rapidez a cambios del producto, la demanda o el proceso.",wrong:"El flujo, la altura y la coordinación no dependen de que los puestos sean reubicables."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Por qué los principios de la distribución deben considerarse en conjunto?",opts:["Porque el orden en que se aplican determina cuál de ellos se descarta", "Porque cada principio reemplaza a los demás cuando uno de ellos se cumple", "Porque acercar dos sectores puede reducir distancias pero comprometer pasillos seguros o cambios futuros", "Porque solo la mínima distancia recorrida influye sobre la productividad final"],a:[2],exp:{ok:"Una mejora en un principio puede afectar a otro; la solución debe equilibrarlos.",wrong:"Los principios son complementarios: ninguno sustituye a otro ni se descarta según el orden de aplicación."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Qué ventajas puede ofrecer una distribución adecuada? Marcá todas las correctas.",opts:["Incrementar los costos de manipulación de materiales", "Disminuir las distancias recorridas por materiales y trabajadores", "Utilizar mejor el espacio disponible", "Aumentar el material en proceso para dar continuidad", "Reducir el tiempo de fabricación"],a:[1, 2, 4],exp:{ok:"Menos distancias, mejor uso del espacio y menor tiempo de fabricación son ventajas citadas.",wrong:"Más material en proceso y más costos de manipulación son lo contrario de lo que busca una buena distribución."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Cómo se relaciona una mejor disposición física con la productividad?",opts:["Reduce movimientos innecesarios y obstáculos, lo que favorece un flujo más rápido y un uso más eficiente de recursos", "Aumenta los movimientos de materiales para que ningún puesto quede sin abastecer", "Eleva la productividad solo cuando se agrega personal en cada estación", "Mejora el flujo porque concentra todo el inventario en un único sector"],a:[0],exp:{ok:"Menos movimientos y obstáculos implican flujo más rápido, menos acumulaciones y mejor uso de recursos.",wrong:"Más movimientos, más personal o concentrar inventario no son el mecanismo por el que la distribución mejora la productividad."}},
+{u:"Distribución en planta: objetivos y principios",q:"Una planta produce más unidades, pero los operarios trabajan en pasillos con cruces peligrosos de autoelevadores. ¿Qué conclusión es correcta?",opts:["La distribución es deficiente únicamente si baja la producción", "La distribución es adecuada, porque la seguridad depende solo del personal", "La distribución es adecuada, porque el aumento de producción es el único objetivo", "La distribución es deficiente, porque no alcanza con producir más si se generan condiciones riesgosas"],a:[3],exp:{ok:"La seguridad forma parte de una buena distribución; producir más no compensa condiciones de trabajo riesgosas.",wrong:"El objetivo principal incluye seguridad y satisfacción, por lo que el aumento de producción por sí solo no valida la distribución."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Cuál de estas opciones NO es un objetivo de la distribución en planta?",opts:["Aumentar el recorrido de los materiales para controlar mejor el proceso", "Evitar congestiones, confusiones y recorridos innecesarios", "Facilitar la adaptación a cambios en productos, volúmenes o procesos", "Mejorar la satisfacción y la moral del personal"],a:[0],exp:{ok:"Se busca evitar recorridos innecesarios, no aumentarlos.",wrong:"Las otras tres son objetivos explícitos del material."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Qué se entiende por flexibilidad en una distribución en planta?",opts:["Poder reemplazar a los operarios sin capacitación adicional", "Poder fabricar cualquier producto con los mismos equipos sin ajustes", "Poder realizar cambios relativamente rápidos ante modificaciones del producto, la demanda o el proceso", "Poder ampliar la planta sin límite de superficie en cualquier momento"],a:[2],exp:{ok:"Flexibilidad es adaptarse con rapidez relativa a cambios en producto, demanda o proceso.",wrong:"Ampliar sin límites, no ajustar equipos o reemplazar personal sin capacitación son exageraciones que el material no plantea."}},
+{u:"Distribución en planta: objetivos y principios",q:"Una empresa instala estanterías altas y libera superficie para un nuevo puesto. ¿Qué principio aplicó y qué logró?",opts:["Mínima distancia recorrida: eliminó el material en proceso", "Espacio cúbico: ahorró superficie ocupada", "Flexibilidad: redujo el tiempo de preparación", "Integración de conjunto: redujo los accidentes"],a:[1],exp:{ok:"Usar la altura disponible es aprovechar el espacio cúbico y permite liberar superficie.",wrong:"Los otros pares principio-efecto no se corresponden con el caso descrito."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Cuáles son los cuatro tipos de distribución en planta que distingue el material?",opts:["Lineal, circular, en U y modular", "Orientada al producto, al cliente, al proceso y al costo", "Orientada al producto, orientada al proceso, de posición fija y de manufactura celular", "De posición fija, por lotes, continua y de ensamble"],a:[2],exp:{ok:"El material distingue esos cuatro tipos según qué elemento organiza la distribución.",wrong:"Las otras listas mezclan formas geométricas, criterios comerciales o tipos de producción."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿Qué distingue a un tipo de distribución de otro?",opts:["El elemento que organiza la distribución: secuencia del producto, similitud de procesos, ubicación fija o célula", "La cantidad de personal asignado a cada sector", "El tipo de energía que consumen los equipos", "El material con el que se fabrican los productos"],a:[0],exp:{ok:"Cada tipo se organiza alrededor de un elemento distinto: secuencia, procesos, ubicación fija o célula.",wrong:"Personal, energía o material no son los criterios que usa el material para clasificar."}},
+{u:"Distribución en planta: objetivos y principios",q:"¿De qué depende la elección del tipo de distribución?",opts:["Del tamaño de la planta, ya que un tipo es superior en todos los casos", "Únicamente del costo de los equipos y de la mano de obra", "Del producto, el volumen, la variedad, la estabilidad de la demanda, el costo de mover el producto y la flexibilidad requerida", "Solo del volumen de producción, porque el resto no influye"],a:[2],exp:{ok:"Depende de varias características; no existe un tipo superior para todas las situaciones.",wrong:"Reducir la decisión a un solo factor o suponer un tipo superior contradice el material."}},
+{u:"Tipos de distribución en planta",q:"En la distribución orientada al producto, las operaciones se disponen:",opts:["Según la secuencia que sigue el producto, con recorridos lineales y pocos retrocesos", "Agrupadas según la similitud de las máquinas, con recorridos variables", "En células en forma de U para una familia de productos", "Alrededor del producto, que permanece en un lugar fijo"],a:[0],exp:{ok:"La disposición sigue la secuencia del producto, con recorridos lineales y directos.",wrong:"Agrupar por similitud es la distribución por proceso; las otras corresponden a posición fija y manufactura celular."}},
+{u:"Tipos de distribución en planta",q:"En la línea de producción, ¿qué caracteriza a la fabricación de unidades discretas?",opts:["Productos individuales y separables, como automóviles o electrodomésticos, que suelen fabricarse por lotes", "Flujos continuos de líquidos o polvos con pocas interrupciones", "Proyectos únicos que no se trasladan del lugar de construcción", "Componentes fabricados en una única máquina sin secuencia"],a:[0],exp:{ok:"Las unidades discretas son productos individuales y separables; entre lotes puede cambiar la preparación del sistema.",wrong:"Los flujos continuos son materiales no discretos y los proyectos fijos corresponden a posición fija."}},
+{u:"Tipos de distribución en planta",q:"¿Cómo se logra el balanceo en una línea de montaje?",opts:["Reubicando las estaciones en forma de U", "Reasignando tareas entre trabajadores", "Realizando cambios mecánicos o de ingeniería", "Aumentando el inventario entre estaciones"],a:[1],exp:{ok:"En el montaje el balanceo se logra reasignando tareas entre trabajadores.",wrong:"Los cambios mecánicos o de ingeniería corresponden a la línea de fabricación de componentes."}},
+{u:"Tipos de distribución en planta",q:"¿Cómo se logra el balanceo en una línea de fabricación de componentes?",opts:["Cambiando el orden de los pedidos según su prioridad", "Reasignando tareas entre trabajadores", "Agregando máquinas iguales sin modificar los tiempos", "Mediante cambios mecánicos o de ingeniería"],a:[3],exp:{ok:"En la fabricación con máquinas el balanceo se logra con cambios mecánicos o de ingeniería.",wrong:"Reasignar tareas entre trabajadores es la forma de balancear una línea de montaje."}},
+{u:"Tipos de distribución en planta",q:"¿Qué industrias menciona el material como ejemplo de producción continua de materiales no discretos?",opts:["Textiles, de calzado, de muebles y de juguetes", "Alimenticias, químicas, petroquímicas, cerveceras, papeleras y cementeras", "Automotrices, electrodomésticas, aeronáuticas y navales", "Constructoras de puentes, carreteras, edificios y barcos"],a:[1],exp:{ok:"Los líquidos, polvos y otros flujos continuos aparecen en esas industrias.",wrong:"Automóviles y electrodomésticos son unidades discretas; puentes y barcos son proyectos de posición fija."}},
+{u:"Tipos de distribución en planta",q:"¿Cuáles son ventajas de la distribución orientada al producto? Marcá todas las correctas.",opts:["Bajo costo variable por unidad en grandes volúmenes estandarizados", "Operación que continúa aunque se interrumpa un punto", "Bajos costos de manejo de materiales", "Gran flexibilidad ante variedad de productos", "Poco inventario de trabajo en proceso"],a:[0, 2, 4],exp:{ok:"Costo unitario bajo, manejo económico de materiales y poco trabajo en proceso son ventajas del tipo.",wrong:"La flexibilidad es débil en este tipo y una interrupción en un punto puede detener toda la línea."}},
+{u:"Tipos de distribución en planta",q:"¿Cuáles son desventajas de la distribución orientada al producto? Marcá todas las correctas.",opts:["Acumula grandes cantidades de producto en proceso", "Tiene poca flexibilidad ante cambios de variedad o de ritmo", "Una interrupción en un punto puede detener toda la línea", "Requiere un volumen alto que justifique la inversión inicial", "Requiere mano de obra muy calificada en cada puesto"],a:[1, 2, 3],exp:{ok:"Necesita volumen alto, depende de que no haya interrupciones y es poco flexible.",wrong:"La capacitación es sencilla y el trabajo en proceso es poco: esos rasgos son ventajas del tipo."}},
+{u:"Tipos de distribución en planta",q:"¿Cuándo conviene la distribución orientada al producto?",opts:["Cuando mover la pieza principal tiene un costo elevado y se producen pocas unidades", "Cuando hay gran variedad de artículos con bajo volumen y demanda inestable", "Cuando se producen muchas unidades iguales o similares y la demanda es relativamente estable", "Cuando se fabrica una familia de productos con un volumen que justifica una célula"],a:[2],exp:{ok:"Conviene con volúmenes altos de productos iguales o similares y demanda estable.",wrong:"Las otras situaciones corresponden a la distribución por proceso, de posición fija y celular."}},
+{u:"Tipos de distribución en planta",q:"La distribución orientada al proceso también se conoce como:",opts:["Producción celular o línea en U", "Producción intermitente o taller de tareas", "Producción continua o línea de montaje", "Producción por proyecto o posición fija"],a:[1],exp:{ok:"Se la llama producción intermitente o taller de tareas.",wrong:"Las otras denominaciones pertenecen a distribuciones orientadas al producto, de posición fija o celular."}},
+{u:"Tipos de distribución en planta",q:"¿Cómo se organiza la distribución orientada al proceso?",opts:["Agrupa máquinas y puestos según la similitud del proceso, y los pedidos circulan entre departamentos", "Ordena los recursos según la secuencia del producto, con un único recorrido", "Reúne los recursos alrededor del proyecto, que permanece inmóvil", "Organiza los recursos en una célula dedicada a una familia de productos"],a:[0],exp:{ok:"Agrupa por similitud de proceso y los productos circulan entre departamentos en lotes o pedidos.",wrong:"Las demás describen la distribución por producto, la de posición fija y la celular."}},
+{u:"Tipos de distribución en planta",q:"¿Cuáles son ventajas de la distribución orientada al proceso? Marcá todas las correctas.",opts:["Poco trabajo en proceso por el flujo continuo", "Pedidos que se completan más rápido por programación sencilla", "La avería de una máquina no necesariamente detiene todo el proceso", "Permite fabricar una gran variedad de productos", "Flexibilidad para asignar equipos y tareas"],a:[2, 3, 4],exp:{ok:"Ofrece flexibilidad, tolera averías puntuales y admite gran variedad de productos.",wrong:"La programación es compleja y el trabajo en proceso tiende a acumularse, por eso esas opciones no son ventajas."}},
+{u:"Tipos de distribución en planta",q:"¿Cuáles son desventajas de la distribución orientada al proceso? Marcá todas las correctas.",opts:["Admite una variedad limitada de productos", "Una avería detiene todo el proceso productivo", "Puede acumular productos en proceso por falta de balanceo", "Requiere mano de obra calificada", "Los pedidos pueden demorar por programación compleja y tiempos de preparación"],a:[2, 3, 4],exp:{ok:"Programación compleja, set-up, mano de obra calificada y acumulación de productos en proceso son desventajas.",wrong:"Una avería no necesariamente detiene todo y la variedad de productos es una ventaja, no una limitación."}},
+{u:"Tipos de distribución en planta",q:"¿Qué criterio se usa al diseñar una distribución orientada al proceso?",opts:["Ordenar los departamentos según el tamaño de sus máquinas", "Ubicar cerca los departamentos entre los que existe un flujo frecuente de piezas", "Ubicar primero los departamentos con menor cantidad de operarios", "Ubicar lejos los departamentos para evitar congestión de pedidos"],a:[1],exp:{ok:"Acercar departamentos con flujo frecuente reduce distancias y costos de manipulación.",wrong:"Alejarlos, ordenarlos por tamaño de máquinas o por cantidad de operarios no reduce los traslados."}},
+{u:"Tipos de distribución en planta",q:"Un taller fabrica piezas a pedido, cada una distinta y en pocas unidades. ¿Qué distribución conviene?",opts:["De posición fija", "Orientada al producto", "Línea de montaje", "Orientada al proceso"],a:[3],exp:{ok:"Gran variedad, bajo volumen de cada artículo y demanda inestable favorecen la distribución por proceso.",wrong:"La orientada al producto requiere volumen alto y estable; la de posición fija es para proyectos que no se mueven."}},
+{u:"Tipos de distribución en planta",q:"¿Qué caracteriza a la distribución de posición fija?",opts:["El producto avanza por estaciones fijas con un ritmo constante", "Las máquinas se agrupan en departamentos por similitud de proceso", "Los trabajadores permanecen en un puesto y rotan los productos", "El producto permanece en un lugar y los trabajadores, materiales y equipos se trasladan hasta él"],a:[3],exp:{ok:"Es el producto o proyecto el que permanece en un sitio.",wrong:"Avanzar por estaciones es la línea de producto y agrupar por similitud es la distribución por proceso."}},
+{u:"Tipos de distribución en planta",q:"¿Cuáles son ejemplos de proyectos de posición fija según el material? Marcá todas las correctas.",opts:["Productos de cervecerías", "Electrodomésticos", "Edificios", "Barcos", "Carreteras y puentes"],a:[2, 3, 4],exp:{ok:"Barcos, carreteras, puentes y edificios son proyectos grandes o difíciles de mover.",wrong:"Los electrodomésticos son unidades discretas y los productos de cervecerías son materiales no discretos de producción continua."}},
+{u:"Tipos de distribución en planta",q:"¿Cuándo conviene la distribución de posición fija?",opts:["Cuando mover la pieza principal tiene un costo elevado, se producen pocas unidades o predominan las operaciones manuales", "Cuando se producen grandes volúmenes estandarizados con demanda estable", "Cuando existe gran variedad de artículos con bajo volumen de cada uno", "Cuando se necesita balancear el flujo entre máquinas para una familia de productos"],a:[0],exp:{ok:"Se elige cuando mover la pieza principal es costoso o se hacen pocas unidades con operaciones manuales.",wrong:"Las demás situaciones corresponden a distribución por producto, celular y por proceso."}},
+{u:"Tipos de distribución en planta",q:"¿Qué es la manufactura celular?",opts:["Disponer las operaciones en línea recta según la secuencia del producto", "Trasladar los recursos hasta un proyecto que no puede moverse", "Organizar máquinas y personas en una célula dedicada a fabricar un producto o una familia de productos", "Agrupar todas las máquinas iguales en un único departamento"],a:[2],exp:{ok:"Una célula reúne máquinas y personas para una familia de productos.",wrong:"Agrupar máquinas iguales es la distribución por proceso; la línea recta y el traslado al proyecto son otros tipos."}},
+{u:"Tipos de distribución en planta",q:"¿Cuáles son ventajas de la manufactura celular? Marcá todas las correctas.",opts:["Necesita menos espacio para almacenar productos en proceso", "Reduce el inventario de trabajo en proceso al equilibrar el flujo entre máquinas", "Aumenta la participación y responsabilidad del personal", "Aumenta el espacio necesario para almacenar productos", "Disminuye la utilización de los equipos"],a:[0, 1, 2],exp:{ok:"Reduce el trabajo en proceso y el espacio de almacenamiento, y aumenta la responsabilidad del personal.",wrong:"También mejora la utilización de equipos; aumentar el espacio de almacenamiento es lo opuesto."}},
+{u:"Tipos de distribución en planta",q:"¿Por qué suelen organizarse las células en forma de U?",opts:["Evita el balanceo entre operaciones consecutivas", "Facilita la inspección inmediata, permite que cada empleado cubra un área mayor y mejora la comunicación", "Separa cada máquina para reducir la interacción del personal", "Permite aumentar la cantidad de trabajadores necesarios por célula"],a:[1],exp:{ok:"Frente a una línea recta, la U facilita inspección, cobertura de área, balanceo y comunicación.",wrong:"La U puede reducir la cantidad de trabajadores y facilita el balanceo y la comunicación, no los dificulta."}},
+{u:"Tipos de distribución en planta",q:"¿Cómo presenta el material a la manufactura celular respecto de la distribución por procesos?",opts:["Como un caso particular de la línea de montaje", "Como su opuesto, porque elimina toda flexibilidad", "Como una evolución que reúne recursos antes dispersos en distintos sectores", "Como una variante de la posición fija"],a:[2],exp:{ok:"La presenta como una evolución de la distribución por procesos, con recursos reunidos en células.",wrong:"No es lo opuesto ni una variante de otro tipo: parte de la lógica de procesos pero los agrupa por familia de productos."}},
+{u:"Tipos de distribución en planta",q:"¿Qué distingue a una línea de montaje de una línea de fabricación según el material?",opts:["La de montaje agrupa máquinas por similitud y la de fabricación mantiene el producto fijo", "La de montaje une partes previamente fabricadas; la de fabricación produce componentes mediante máquinas", "La de montaje solo procesa líquidos y la de fabricación solo productos discretos", "La de montaje no necesita coordinar estaciones y la de fabricación no usa máquinas"],a:[1],exp:{ok:"El montaje integra partes en estaciones coordinadas; la fabricación procesa componentes en una secuencia de máquinas.",wrong:"La distinción se relaciona con ensamblar partes o fabricar componentes, no con líquidos ni con la ausencia de coordinación."}},
+{u:"Tipos de distribución en planta",q:"¿Para qué sirve el balanceo de una línea de montaje?",opts:["Para que cada estación tenga una carga compatible con el ritmo de avance", "Para que cada trabajador realice una tarea sin relación con otras estaciones", "Para aumentar los recorridos entre departamentos", "Para evitar que se mida la duración de las tareas"],a:[0],exp:{ok:"El balanceo coordina las tareas y distribuye la carga entre estaciones.",wrong:"Una línea necesita compatibilizar tiempos para evitar esperas y estaciones limitantes."}},
+{u:"Tipos de distribución en planta",q:"¿Qué limitación es propia de la posición fija?",opts:["Puede demandar mucho espacio y dificultar el uso de equipos grandes", "Impide compartir tareas entre operarios calificados", "Obliga a producir exclusivamente grandes volúmenes estandarizados", "Genera necesariamente el mayor costo de movimiento del producto terminado"],a:[0],exp:{ok:"El proyecto puede ocupar una superficie amplia y restringir equipos difíciles de trasladar.",wrong:"La principal dificultad se relaciona con el espacio y el traslado de recursos, no con la estandarización."}},
+{u:"Tipos de distribución en planta",q:"Una fábrica busca reducir inventario en proceso y agrupar recursos para una familia de piezas. ¿Qué alternativa encaja mejor?",opts:["Manufactura celular", "Posición fija", "Distribución por proceso sin cambios de flujo", "Producción continua de líquidos"],a:[0],exp:{ok:"La manufactura celular reúne recursos para una familia y busca un flujo equilibrado con menos inventario en proceso.",wrong:"La célula se diseña para acercar operaciones relacionadas y coordinar el flujo de una familia."}},
+{u:"Tipos de distribución en planta",q:"Una empresa tiene alto volumen de un producto, pero los puestos generan acumulaciones entre etapas. ¿Qué combinación es más coherente?",opts:["Eliminar el balanceo porque el volumen es alto", "Trasladar el producto a una posición fija", "Revisar el flujo y balancear estaciones para reducir esperas y trabajo en proceso", "Cambiar automáticamente a muestreo sin analizar la línea"],a:[2],exp:{ok:"El balanceo y el análisis del flujo ayudan a coordinar estaciones y reducir acumulaciones.",wrong:"El alto volumen puede justificar una línea, pero no elimina la necesidad de balancear sus operaciones."}},
+{u:"Medición del trabajo y muestreo",q:"¿Qué es la medición del trabajo?",opts:["Evaluar el desempeño de cada trabajador para fijar su salario", "Aplicar técnicas para determinar el tiempo que necesita un trabajador calificado para una tarea definida con un método y una norma establecidos", "Contar la cantidad de unidades que produce una planta en un período", "Registrar los accidentes ocurridos durante la ejecución de una tarea"],a:[1],exp:{ok:"Es el conjunto de técnicas para fijar el tiempo de una tarea definida, con método y norma de ejecución previos.",wrong:"Contar unidades, evaluar salarios o registrar accidentes no son el objeto de la medición del trabajo."}},
+{u:"Medición del trabajo y muestreo",q:"¿Para qué sirve la medición del trabajo?",opts:["Para fijar el ritmo máximo que cada operario debe sostener", "Para distinguir tiempos productivos de improductivos y establecer tiempos tipo", "Para determinar la distribución en planta más conveniente", "Para reemplazar el análisis del método por un cálculo estadístico"],a:[1],exp:{ok:"Permite separar tiempos productivos de improductivos y establecer tiempos tipo.",wrong:"No reemplaza el análisis del método ni fija ritmos máximos; la distribución en planta es otro tema."}},
+{u:"Medición del trabajo y muestreo",q:"¿Por qué el tiempo medido solo tiene sentido si se conoce el método?",opts:["Porque sin método no se puede utilizar un cronómetro", "Porque cada método usa una escala de valoración distinta", "Porque el método determina el salario que corresponde al operario", "Porque el tiempo corresponde a una tarea y un método específicos, no a cualquier forma de realizarla"],a:[3],exp:{ok:"El tiempo medido es válido para la tarea y el método con los que se midió.",wrong:"El método no define el salario ni condiciona el uso del cronómetro ni la escala de valoración."}},
+{u:"Medición del trabajo y muestreo",q:"¿Cuál es la secuencia general de medición que propone el material?",opts:["Examinar, seleccionar, medir, registrar, definir el método y compilar el tiempo tipo", "Registrar, seleccionar, medir, compilar, examinar críticamente y definir el método", "Seleccionar, medir, registrar, examinar, definir el método y compilar el tiempo tipo", "Seleccionar, registrar, examinar críticamente, medir, compilar el tiempo tipo y definir actividades y método"],a:[3],exp:{ok:"Primero se define y analiza el trabajo; después se mide y recién entonces se compila el tiempo tipo.",wrong:"Las otras alteran el orden y llevarían a medir o fijar estándares sin entender primero el trabajo."}},
+{u:"Medición del trabajo y muestreo",q:"En la etapa de examen crítico de la medición del trabajo, ¿qué se hace?",opts:["Se asignan los suplementos de descanso a cada elemento", "Se calcula el tamaño de muestra según el nivel de confianza", "Se comunica a los operarios el tiempo tipo establecido", "Se comprueba si se usan métodos y movimientos eficaces y se separan los elementos productivos de los improductivos"],a:[3],exp:{ok:"El examen crítico revisa la eficacia del método y distingue lo productivo de lo improductivo.",wrong:"El tamaño de muestra, los suplementos y la comunicación del tiempo tipo corresponden a otras etapas."}},
+{u:"Medición del trabajo y muestreo",q:"¿Cuáles son los tres métodos de medición del trabajo que presenta el material?",opts:["Muestreo del trabajo, estudio de tiempos por cronometraje y normas de tiempos predeterminadas", "Muestreo del trabajo, balanceo de línea y estudio de movimientos", "Muestreo, diagrama de recorrido y estudio de tiempos por cronometraje", "Cronometraje, valoración del ritmo y normas de tiempos predeterminadas"],a:[0],exp:{ok:"Los tres métodos son muestreo, cronometraje y NTPD.",wrong:"El balanceo, la valoración del ritmo y el diagrama de recorrido no son métodos de medición en el material."}},
+{u:"Medición del trabajo y muestreo",q:"¿En qué se diferencian los tres métodos de medición?",opts:["En la unidad de tiempo que usan para expresar los resultados", "En cómo obtienen la información: observaciones aleatorias, registro de duraciones o tiempos asignados a movimientos", "En el tipo de trabajador que se puede estudiar con cada uno", "En el tipo de distribución en planta en que se aplican"],a:[1],exp:{ok:"Cada método obtiene la información de manera distinta: muestreo, cronómetro o tiempos predeterminados.",wrong:"La diferencia no está en el trabajador, la unidad ni la distribución en planta."}},
+{u:"Medición del trabajo y muestreo",q:"¿Qué es el muestreo del trabajo?",opts:["Una técnica que asigna tiempos predeterminados a movimientos básicos", "Una técnica estadística que usa observaciones instantáneas en momentos aleatorios para estimar proporciones de tiempo", "Una técnica que mide cada ciclo con cronómetro de manera continua", "Una técnica que valora el ritmo de un trabajador calificado"],a:[1],exp:{ok:"Estima qué proporción del tiempo se dedica a distintas actividades con observaciones instantáneas aleatorias.",wrong:"Medir ciclos con cronómetro es cronometraje y asignar tiempos a movimientos son las NTPD."}},
+{u:"Medición del trabajo y muestreo",q:"¿Cuáles son usos principales del muestreo del trabajo? Marcá todas las correctas.",opts:["Estimar proporciones de tiempo de trabajo e inactividad", "Detectar cuellos de botella y tiempos improductivos", "Determinar con detalle la duración de cada elemento de un ciclo", "Asignar tiempos a movimientos básicos antes de producir", "Evaluar la utilización de trabajadores y máquinas"],a:[0, 1, 4],exp:{ok:"El muestreo estima proporciones, evalúa utilización y ayuda a detectar cuellos de botella.",wrong:"La duración detallada de cada elemento es propia del cronometraje y la asignación a movimientos es propia de las NTPD."}},
+{u:"Medición del trabajo y muestreo",q:"¿Qué es un cuello de botella?",opts:["Un elemento que dura más que los demás de un ciclo", "Una etapa cuya capacidad limita el rendimiento del proceso", "Una acumulación de producto terminado en el depósito", "Un movimiento innecesario que se repite en cada ciclo"],a:[1],exp:{ok:"Es la etapa que limita el rendimiento total del proceso.",wrong:"Un elemento más largo es el elemento dominante; acumular producto terminado o repetir movimientos no define un cuello de botella."}},
+{u:"Medición del trabajo y muestreo",q:"¿Para qué sirve la prueba piloto en el muestreo del trabajo?",opts:["Para decidir los suplementos que se agregarán al tiempo básico", "Para fijar el tiempo tipo de la operación estudiada", "Para valorar el ritmo del operario observado", "Para obtener una proporción inicial estimada (p) del tiempo dedicado a la actividad"],a:[3],exp:{ok:"La prueba piloto estima p, que luego permite calcular el tamaño de muestra.",wrong:"Tiempo tipo, valoración y suplementos pertenecen al estudio de tiempos, no al muestreo."}},
+{u:"Medición del trabajo y muestreo",q:"¿De qué depende el tamaño de la muestra (n) en el muestreo del trabajo?",opts:["De la cantidad de operarios y del turno en que se observa", "De la duración del ciclo y del número de elementos", "De la valoración del ritmo y de los suplementos aplicados", "De la proporción estimada, el nivel de confianza y el margen de error permitido"],a:[3],exp:{ok:"El número de observaciones depende de p, de la confianza deseada y de la precisión requerida.",wrong:"Turno, ciclos, elementos, valoración y suplementos no intervienen en el cálculo de n."}},
+{u:"Medición del trabajo y muestreo",q:"¿Por qué las observaciones del muestreo deben programarse de forma completamente aleatoria?",opts:["Para que el operario pueda prepararse antes de cada observación", "Para evitar que el analista necesite una prueba piloto", "Para observar solo los momentos de mayor actividad", "Para reducir el riesgo de observar siempre los mismos momentos o situaciones"],a:[3],exp:{ok:"La aleatoriedad evita sesgos por observar momentos o situaciones repetidas.",wrong:"Anunciar, elegir los momentos de mayor actividad o prescindir de la prueba piloto sesgarían el resultado."}},
+{u:"Medición del trabajo y muestreo",q:"Si p es la proporción estimada de una actividad, ¿cuánto vale q cuando ambas se expresan como proporciones?",opts:["q = p ÷ n", "q = 1 − p", "q = 1 + p", "q = n × p"],a:[1],exp:{ok:"q es la proporción complementaria: q = 1 − p.",wrong:"Dividir o multiplicar por n no da el complemento, y 1 + p superaría el 100 %."}},
+{u:"Medición del trabajo y muestreo",q:"En el ejemplo con margen de ±5 puntos porcentuales y 95 % de confianza, ¿cuántas observaciones aproximadas necesita el muestreo?",opts:["Alrededor de 3000", "Alrededor de 300", "Alrededor de 100", "Alrededor de 30"],a:[1],exp:{ok:"Con p = 25 %, ±5 puntos y 95 % de confianza, el material llega a unas 300 observaciones.",wrong:"Treinta o cien observaciones darían un margen de error mayor; tres mil excede lo que pide el ejemplo."}},
+{u:"Medición del trabajo y muestreo",q:"El número cercano a 300 observaciones del ejemplo del material:",opts:["Depende solo del número de operarios observados", "Es la cantidad máxima permitida para un estudio", "Corresponde a ese caso y puede cambiar con otra proporción, margen o confianza", "Es la cantidad mínima fija para cualquier estudio de muestreo"],a:[2],exp:{ok:"Es el resultado para esas condiciones; si cambian, cambia n.",wrong:"No es una cantidad fija ni un máximo, y no depende de cuántos operarios se observan."}},
+{u:"Medición del trabajo y muestreo",q:"¿Cuáles son ventajas del muestreo del trabajo? Marcá todas las correctas.",opts:["No exige observación continua durante períodos prolongados", "Elimina la necesidad de que las observaciones sean representativas", "Reduce el trabajo de oficina del analista", "Permite estudiar grupos de operarios con un solo analista", "Registra con detalle la duración de cada elemento de un ciclo"],a:[0, 2, 3],exp:{ok:"Evita la observación continua, reduce trabajo de oficina y permite estudiar grupos con un analista.",wrong:"No registra la duración detallada de cada elemento y sus conclusiones dependen de que las observaciones sean representativas."}},
+{u:"Medición del trabajo y muestreo",q:"Un analista quiere saber qué porcentaje de la jornada una máquina está parada, sin cronometrar. ¿Qué técnica elige?",opts:["Valoración del ritmo", "Normas de tiempos predeterminadas", "Estudio de tiempos por cronometraje", "Muestreo del trabajo"],a:[3],exp:{ok:"El muestreo estima proporciones de actividad e inactividad sin observación continua.",wrong:"El cronometraje mide duraciones y las NTPD calculan tiempos de movimientos; la valoración del ritmo no es un método de medición."}},
+{u:"Medición del trabajo y muestreo",q:"¿Cuál es una utilidad de establecer tiempos tipo confiables?",opts:["Eliminar la necesidad de planificar la producción", "Garantizar que todas las tareas tengan igual duración", "Apoyar la planificación y la comparación del desempeño bajo condiciones definidas", "Evitar la capacitación del personal"],a:[2],exp:{ok:"Los tiempos tipo sirven como referencia para organizar y planificar operaciones.",wrong:"No igualan todas las tareas ni reemplazan capacitación o planificación."}},
+{u:"Medición del trabajo y muestreo",q:"¿Cuál es el primer paso de un estudio por muestreo?",opts:["Calcular el tiempo básico con la escala británica", "Agregar suplementos al tiempo observado", "Definir el objetivo y las actividades que se registrarán", "Seleccionar los códigos de MTM-2"],a:[2],exp:{ok:"El estudio debe definir qué busca medir y qué categorías registrará.",wrong:"Sin un objetivo y actividades definidas no puede planificarse ni interpretarse el muestreo."}},
+{u:"Medición del trabajo y muestreo",q:"¿Qué significa un margen de error de ±5 puntos porcentuales?",opts:["Que el tiempo de cada ciclo puede variar cinco minutos", "Que cinco de cada cien observaciones deben descartarse", "Que el 5 % de los trabajadores es improductivo", "Que la estimación puede diferir del valor real dentro de ese margen según el nivel de confianza"],a:[3],exp:{ok:"El margen de error expresa la precisión esperada de una estimación muestral.",wrong:"No describe minutos por ciclo ni una cuota de observaciones a descartar."}},
+{u:"Medición del trabajo y muestreo",q:"Un recurso tiene muchas observaciones de espera. ¿Qué conclusión es más prudente?",opts:["La causa está demostrada y no hace falta investigar", "El resultado puede señalar una oportunidad para investigar cuellos de botella o tiempos improductivos", "El recurso debe eliminarse inmediatamente", "El muestreo demuestra que el método es óptimo"],a:[1],exp:{ok:"El muestreo señala patrones que deben interpretarse y analizarse antes de decidir.",wrong:"Las observaciones ayudan a detectar posibles problemas, pero no prueban por sí solas la causa."}},
+{u:"Medición del trabajo y muestreo",q:"¿Qué limitación tiene el muestreo si se necesita conocer la duración detallada de cada elemento?",opts:["No puede observar máquinas", "No permite estimar proporciones de actividad", "No sustituye automáticamente al cronometraje detallado de cada ciclo", "Solo sirve para procesos químicos"],a:[2],exp:{ok:"El muestreo estima distribución del tiempo, pero no registra necesariamente la duración de cada elemento.",wrong:"Para tiempos elementales detallados, el cronometraje puede ser más apropiado."}},
+{u:"Medición del trabajo y muestreo",q:"¿Qué puede alterar la confiabilidad de los resultados del muestreo?",opts:["Definir previamente las categorías", "Realizar observaciones en momentos aleatorios", "Analizar los datos tras completar la muestra", "Observar situaciones poco representativas de la actividad habitual"],a:[3],exp:{ok:"Una muestra no representativa puede producir conclusiones sesgadas.",wrong:"La aleatoriedad y la definición previa ayudan; observar situaciones atípicas de forma desproporcionada perjudica la estimación."}},
+{u:"Medición del trabajo y muestreo",q:"¿Qué ocurre si se reduce el margen de error deseado, manteniendo lo demás comparable?",opts:["La muestra necesaria suele disminuir", "La muestra necesaria suele aumentar", "El nivel de confianza pasa automáticamente a cero", "La proporción p se vuelve igual a q"],a:[1],exp:{ok:"Exigir más precisión normalmente requiere más observaciones.",wrong:"Un margen más estrecho demanda mayor información para sostener la estimación."}},
+{u:"Medición del trabajo y muestreo",q:"¿Qué opción conecta correctamente layout y medición del trabajo?",opts:["El layout establece TMU y MTM organiza depósitos", "La medición del trabajo determina por sí sola dónde ubicar cada máquina", "El layout organiza espacio y flujos; la medición cuantifica tiempos y ayuda a detectar ineficiencias", "Ambos conceptos se ocupan exclusivamente del costo salarial"],a:[2],exp:{ok:"Son enfoques complementarios: uno organiza recursos físicamente y el otro estudia el tiempo requerido.",wrong:"Distribución en planta y medición del trabajo tienen objetos distintos, aunque ambos pueden mejorar productividad."}},
+{u:"Medición del trabajo y muestreo",q:"¿Cuál es la secuencia más consistente para fijar un tiempo tipo fiable?",opts:["Elegir el menor tiempo, ignorar el método y sumar un margen general", "Definir método, dividir en elementos, medir o estimar, valorar cuando corresponda y añadir suplementos justificados", "Sumar suplementos, medir después y eliminar la valoración", "Usar únicamente la proporción de inactividad para fijar cada tiempo elemental"],a:[1],exp:{ok:"El estándar surge de un método definido, análisis y medición adecuados, valoración cuando aplica y suplementos justificados.",wrong:"Un tiempo tipo no debe basarse en el menor registro ni en márgenes arbitrarios."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué registra el estudio de tiempos por cronometraje?",opts:["Los tiempos asignados a movimientos básicos de una tabla", "Los tiempos y el ritmo de trabajo, para establecer cuánto debería tardar un trabajador calificado según una norma de ejecución", "Las distancias recorridas por los materiales entre operaciones", "Las proporciones de actividad e inactividad en momentos aleatorios"],a:[1],exp:{ok:"Registra tiempos y ritmo para fijar cuánto debería tardar un trabajador calificado.",wrong:"Las proporciones aleatorias son muestreo, los tiempos tabulados son NTPD y las distancias pertenecen a la distribución en planta."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Cuál es la condición fundamental antes de iniciar un estudio de tiempos?",opts:["Definir y estandarizar el mejor método de trabajo", "Determinar los suplementos por descanso del puesto", "Seleccionar al operario más rápido del sector", "Calcular el tamaño de muestra con una prueba piloto"],a:[0],exp:{ok:"El tiempo medido corresponde al método, por eso debe estandarizarse primero.",wrong:"Elegir al más rápido, calcular muestras o fijar suplementos no reemplaza definir el método."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Cuál es la secuencia correcta de las primeras etapas del estudio de tiempos?",opts:["Obtener información, describir el método y dividir en elementos, examinar los elementos y medir el tiempo de cada uno", "Obtener información, medir el tiempo, dividir en elementos y examinar el método", "Describir el método, obtener información, medir el tiempo y examinar los elementos", "Examinar los elementos, obtener información, dividir en elementos y medir el tiempo"],a:[0],exp:{ok:"Primero se reúne información, luego se describe y divide el método, se examina y recién después se mide.",wrong:"Las otras miden antes de describir o examinar, lo que invalida el estudio."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué se hace en la etapa de valoración del estudio de tiempos?",opts:["Se valora la velocidad efectiva del operario en comparación con el ritmo tipo", "Se establece el tiempo tipo definitivo de la operación", "Se registra el tiempo observado de cada elemento", "Se calculan los suplementos que se añadirán al tiempo básico"],a:[0],exp:{ok:"La valoración compara la velocidad efectiva del operario con el ritmo tipo.",wrong:"Suplementos, tiempo tipo y registro de tiempos son etapas distintas."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué es un elemento en el estudio de tiempos?",opts:["La sucesión completa de acciones necesaria para producir una unidad", "El tiempo que un operario dedica a descansar entre ciclos", "El conjunto de movimientos básicos de una norma predeterminada", "Una parte delimitada de una tarea, separada para facilitar su observación, medición y análisis"],a:[3],exp:{ok:"Un elemento es una parte delimitada de la tarea.",wrong:"La sucesión completa es el ciclo; los descansos y los movimientos tabulados son otros conceptos."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Para qué sirve dividir la tarea en elementos? Marcá todas las correctas.",opts:["Evitar la necesidad de estandarizar el método", "Identificar elementos que provocan fatiga y determinar suplementos", "Valorar el ritmo con mayor precisión que en el ciclo completo", "Reemplazar la medición del tiempo por una estimación", "Separar el trabajo productivo del improductivo"],a:[1, 2, 4],exp:{ok:"La división permite separar lo productivo, valorar con precisión y detectar elementos que causan fatiga.",wrong:"No elimina la estandarización del método ni reemplaza la medición."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Cómo deben ser los límites de un elemento?",opts:["Coincidir con el comienzo y el final de cada turno de trabajo", "Claramente identificables, como un sonido o un cambio de dirección de la mano", "Definirse después de cronometrar el ciclo completo", "Ser lo más largos posible para reducir las lecturas"],a:[1],exp:{ok:"Los elementos necesitan un comienzo y un final identificables, por ejemplo un sonido o un cambio de dirección.",wrong:"Deben ser breves pero cronometrables y definirse antes de medir."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué es un ciclo de trabajo?",opts:["El período entre dos paradas programadas de la máquina", "El tiempo total que dura el turno de un operario", "Una parte delimitada de la tarea con comienzo y final identificables", "La sucesión de elementos necesaria para completar una tarea u obtener una unidad de producción"],a:[3],exp:{ok:"Es la sucesión de elementos que completa la tarea o produce una unidad.",wrong:"La parte delimitada es el elemento; paradas y turnos no definen el ciclo."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué diferencia hay entre ciclo y elemento?",opts:["El ciclo es una parte delimitada de la tarea; el elemento es la secuencia completa", "El ciclo es la secuencia completa de la tarea; el elemento es una parte delimitada de esa secuencia", "El ciclo mide tiempos productivos y el elemento mide solo los improductivos", "Son equivalentes, pero el ciclo se usa en NTPD y el elemento en cronometraje"],a:[1],exp:{ok:"El ciclo es el todo; el elemento, una parte de él.",wrong:"No son equivalentes ni se invierten, y ninguno de los dos se limita a tiempos productivos o improductivos."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Cuántos tipos de elementos distingue el material y cómo se relacionan?",opts:["Seis, y las categorías se excluyen entre sí", "Cuatro, y cada elemento pertenece a una sola categoría", "Ocho, y cada elemento pertenece a una sola categoría", "Ocho, y las categorías no se excluyen entre sí"],a:[3],exp:{ok:"Son ocho tipos y un elemento puede pertenecer a varios, por ejemplo repetitivo y constante.",wrong:"Las demás cambian la cantidad o suponen que las categorías son excluyentes."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"Tomar una pieza antes de montarla, algo que ocurre en cada ciclo estudiado, es un elemento:",opts:["Repetitivo", "Extraño", "Dominante", "Casual"],a:[0],exp:{ok:"Los elementos repetitivos aparecen en cada ciclo.",wrong:"Un casual no aparece en todos los ciclos; el dominante es el más largo y el extraño no es necesario."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"Ajustar la máquina o recibir instrucciones, que aparecen a intervalos regulares o irregulares, son elementos:",opts:["Repetitivos", "Casuales", "Mecánicos", "Constantes"],a:[1],exp:{ok:"Los casuales no aparecen en todos los ciclos.",wrong:"Los repetitivos sí aparecen en cada ciclo; constantes y mecánicos clasifican por duración o por quién los ejecuta."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué ocurre con los elementos casuales que forman parte del trabajo útil?",opts:["Se miden solo en el primer ciclo y se descartan después", "Se tratan como elementos extraños", "Se excluyen del tiempo tipo por no aparecer en todos los ciclos", "Se incorporan al tiempo tipo definitivo"],a:[3],exp:{ok:"Si forman parte del trabajo útil, se incluyen en el tiempo tipo.",wrong:"Que no aparezcan en todos los ciclos no los excluye, y no son extraños porque sí son necesarios."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué distingue a un elemento constante de uno variable?",opts:["El constante lo realiza una máquina y el variable lo realiza el trabajador", "El constante aparece en todos los ciclos y el variable solo en algunos", "El tiempo básico del constante no cambia; el del variable depende de características como dimensiones, peso, dureza o distancia", "El constante dura más que los demás y el variable dura menos"],a:[2],exp:{ok:"La diferencia es la estabilidad del tiempo básico frente a factores como peso o distancia.",wrong:"Quién lo ejecuta, la frecuencia o la duración relativa corresponden a otras clasificaciones."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"Transportar piezas a otro taller, cuando el tiempo depende del recorrido, es un elemento:",opts:["Mecánico", "Dominante", "Constante", "Variable"],a:[3],exp:{ok:"Su tiempo básico cambia según la distancia.",wrong:"Un elemento constante mantiene su tiempo; las otras categorías no se definen por la distancia."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué diferencia hay entre elementos manuales y mecánicos?",opts:["Los manuales son productivos; los mecánicos son improductivos", "Los manuales aparecen en cada ciclo; los mecánicos solo en algunos", "Los manuales tienen tiempo constante; los mecánicos tiempo variable", "Los manuales los realiza el trabajador; los mecánicos los realiza automáticamente una máquina o proceso con fuerza motriz"],a:[3],exp:{ok:"La diferencia es quién ejecuta el elemento: el trabajador o la máquina.",wrong:"No depende de la frecuencia, de la constancia del tiempo ni de si son productivos."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué es un elemento dominante?",opts:["El que aparece con mayor frecuencia a lo largo de los ciclos", "El que dura más que cualquiera de los demás elementos que se realizan durante el ciclo", "El que no forma parte necesaria del trabajo", "El que realiza el trabajador más calificado del sector"],a:[1],exp:{ok:"El dominante es el más largo del ciclo, por ejemplo mecanizar una pieza mientras se hacen controles ocasionales.",wrong:"La frecuencia describe al repetitivo y el que no es necesario es el extraño."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"Repetir un lijado porque la pieza no quedó bien terminada en una etapa anterior es un elemento:",opts:["Repetitivo", "Extraño", "Casual", "Dominante"],a:[1],exp:{ok:"Se observa en el estudio, pero no es parte necesaria del trabajo.",wrong:"Un casual sí forma parte del trabajo útil aunque no aparezca siempre; el repetitivo y el dominante tampoco describen un trabajo innecesario."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Por qué un elemento extraño requiere análisis?",opts:["Porque equivale a un elemento casual con otro nombre", "Porque no debe confundirse con una parte necesaria del método solo porque aparezca durante la observación", "Porque debe sumarse al tiempo tipo para no subestimarlo", "Porque indica que el trabajador no está calificado"],a:[1],exp:{ok:"Aparece en la observación, pero el análisis muestra que no es parte necesaria del trabajo.",wrong:"No se suma al tiempo tipo ni refleja la calificación del trabajador; tampoco es un casual."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué valor corresponde al ritmo tipo en la escala británica de valoración?",opts:["125", "75", "50", "100"],a:[3],exp:{ok:"El ritmo tipo vale 100.",wrong:"50 es muy lento, 75 es constante y resuelto, y 125 es muy rápido."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué significa una valoración de 125 en la escala británica?",opts:["Ritmo excepcionalmente rápido, difícil de mantener durante períodos prolongados", "Ritmo constante y resuelto, sin prisa", "Ritmo muy rápido, con gran seguridad y destreza", "Ritmo tipo de un trabajador calificado medio"],a:[2],exp:{ok:"125 indica muy rápido, con gran seguridad y destreza.",wrong:"El ritmo excepcionalmente rápido corresponde a 150, el constante y resuelto a 75 y el ritmo tipo a 100."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"Una valoración de 75 en la escala británica corresponde a un trabajador que:",opts:["Se mueve de forma torpe e insegura y con poco interés", "Rinde al ritmo tipo con la calidad requerida", "Muestra actividad nula", "Es constante y resuelto, sin prisa; parece lento, pero no pierde tiempo"],a:[3],exp:{ok:"75 indica ritmo constante y resuelto, sin prisa.",wrong:"Torpe e inseguro es 50, el ritmo tipo es 100 y la actividad nula es 0."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"Un ciclo observado dura 0,25 min con una valoración de 80. ¿Cuál es el tiempo básico?",opts:["0,20 min", "2,00 min", "0,31 min", "0,25 min"],a:[0],exp:{ok:"Tiempo básico = 0,25 × 80 ÷ 100 = 0,20 min.",wrong:"0,31 sale de dividir por 0,8; 0,25 no ajusta por el ritmo y 2,00 olvida dividir por 100."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué es el tiempo básico?",opts:["El tiempo que requeriría la tarea al ritmo tipo, tras ajustar el tiempo observado por la valoración", "El tiempo que dura el elemento dominante del ciclo", "El tiempo asignado a la tarea incluyendo los suplementos", "El tiempo registrado durante la observación real del operario"],a:[0],exp:{ok:"Es el tiempo observado ajustado por la valoración del ritmo.",wrong:"El observado es el registrado; el que incluye suplementos es el tiempo tipo."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué es el tiempo tipo?",opts:["El tiempo promedio de todas las lecturas del cronómetro de un estudio", "El tiempo asignado a una tarea definida, realizada por un trabajador calificado con el método especificado e incluyendo los suplementos", "El tiempo observado ajustado por la valoración, sin suplementos", "El tiempo que tarda el trabajador más rápido del sector"],a:[1],exp:{ok:"Se obtiene sumando al tiempo básico los suplementos correspondientes.",wrong:"Sin suplementos es el tiempo básico; el promedio de lecturas y el del más rápido no definen el tiempo tipo."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Cuáles son suplementos que se añaden al tiempo básico? Marcá todas las correctas.",opts:["Por descanso", "Por valoración del ritmo", "Por factores ambientales", "Por elementos extraños", "Por contingencias"],a:[0, 2, 4],exp:{ok:"El material menciona suplementos por descanso, factores ambientales y contingencias.",wrong:"La valoración del ritmo ajusta el tiempo observado; los elementos extraños se analizan y no forman un suplemento."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué advierte el material sobre los suplementos?",opts:["Que deben omitirse cuando el elemento es mecánico", "Que deben fijarse con el mismo porcentaje para cualquier operación", "Que no deben usarse como un margen arbitrario de elasticidad o seguridad", "Que deben calcularse antes de valorar el ritmo del operario"],a:[2],exp:{ok:"Los suplementos deben responder a necesidades justificadas.",wrong:"No se fijan con un porcentaje único ni se calculan antes de la valoración."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué contempla el suplemento por contingencias?",opts:["El tiempo de preparación del equipo antes de cada lote", "Condiciones como temperatura, humedad, ruido e iluminación", "La recuperación de los efectos físicos y psicológicos del trabajo", "Pequeñas demoras que ocurren de manera infrecuente"],a:[3],exp:{ok:"Cubre demoras pequeñas y poco frecuentes.",wrong:"La recuperación es el suplemento por descanso, las condiciones del ambiente son el factor ambiental y la preparación es el set-up."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Cuál de estas secuencias describe mejor la relación entre tiempos?",opts:["Tiempo tipo → tiempo observado → tiempo básico → valoración", "Suplemento → valoración → tiempo observado → tiempo básico", "Tiempo básico → método → tiempo observado → eliminación de suplementos", "Tiempo observado ajustado por valoración → tiempo básico; luego suplementos → tiempo tipo"],a:[3],exp:{ok:"El tiempo observado se ajusta al ritmo tipo y después se agregan suplementos pertinentes.",wrong:"La secuencia parte de la observación y valoración, obtiene el tiempo básico y finalmente incorpora suplementos."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"El tiempo básico de apretar una tuerca no cambia en condiciones equivalentes. Se trata de un elemento:",opts:["Variable", "Constante", "Extraño", "Casual"],a:[1],exp:{ok:"Un elemento constante mantiene el mismo tiempo básico.",wrong:"Variable cambia según factores del producto o proceso; casual depende de la frecuencia."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué información puede registrarse en una planilla de estudio de tiempos?",opts:["Únicamente el nombre del trabajador", "Solo el costo de venta del producto", "La demanda anual sin datos del proceso", "Operación, equipo, producto, condiciones, ciclo, elemento y lecturas"],a:[3],exp:{ok:"La planilla documenta el contexto y las observaciones necesarias para interpretar las mediciones.",wrong:"Se necesitan datos de la tarea y del entorno además de las lecturas de tiempo."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué permite comparar el tiempo de un mismo elemento entre ciclos?",opts:["Detectar variaciones y analizar sus posibles causas", "Demostrar que todos los ciclos son idénticos", "Eliminar la necesidad de valorar el ritmo", "Calcular automáticamente el tamaño de muestra estadística"],a:[0],exp:{ok:"La comparación revela diferencias que pueden requerir análisis.",wrong:"Los ciclos pueden variar; compararlos no garantiza igualdad ni sustituye otros pasos del estudio."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué suplemento contempla la recuperación de efectos físicos y psicológicos del trabajo?",opts:["Suplemento por contingencias exclusivamente", "Suplemento por calidad", "Suplemento por descanso", "Suplemento por distancia"],a:[2],exp:{ok:"El suplemento por descanso considera la recuperación necesaria.",wrong:"Los suplementos ambientales y por contingencias cubren otros factores."}},
+{u:"Cronometraje, elementos y valoración del ritmo",q:"¿Qué caracteriza a un trabajador calificado para este estudio?",opts:["Tiene conocimientos y habilidades para cumplir calidad y seguridad requeridas", "Trabaja siempre al ritmo más rápido observado", "No necesita conocer el método establecido", "Realiza la tarea sin herramientas ni instrucciones"],a:[0],exp:{ok:"La referencia es una persona competente que cumple las exigencias de calidad y seguridad.",wrong:"La calificación no significa velocidad máxima ni ausencia de método."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué son las normas de tiempos predeterminadas (NTPD)?",opts:["Una técnica que cronometra cada ciclo real de la operación", "Una técnica que usa tiempos establecidos para movimientos humanos básicos para calcular el tiempo de una tarea", "Una escala que valora el ritmo del trabajador observado", "Una técnica estadística de observaciones instantáneas aleatorias"],a:[1],exp:{ok:"Asignan tiempos preestablecidos a movimientos básicos para calcular el tiempo de la tarea.",wrong:"Cronometrar ciclos es otra técnica, el muestreo es estadístico y la valoración del ritmo es una escala."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué diferencia a las NTPD del cronometraje?",opts:["No es necesario medir directamente la duración de cada ciclo real para asignar tiempo a los movimientos", "Miden proporciones de tiempo en vez de duraciones", "Exigen valorar el ritmo del operario en cada observación", "Solo pueden aplicarse una vez iniciada la producción"],a:[0],exp:{ok:"Los tiempos salen de reglas predeterminadas, por lo que se puede analizar tareas nuevas antes de producir.",wrong:"Las NTPD no dependen de valorar el ritmo y pueden usarse antes de producir; medir proporciones es muestreo."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué significa la sigla MTM?",opts:["Method-Task Measurement, medición de método-tarea", "Machine-Time Management, gestión del tiempo de máquina", "Motion-Time Matrix, matriz de tiempo-movimiento", "Methods-Time Measurement, medición de tiempos-métodos"],a:[3],exp:{ok:"MTM es Methods-Time Measurement.",wrong:"Las otras expansiones suenan parecidas pero no corresponden al sistema."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Con qué empresa se vincula el origen del sistema MTM según el material?",opts:["General Electric", "Westinghouse Electric Corporation", "Ford Motor Company", "General Motors"],a:[1],exp:{ok:"El MTM fue ideado inicialmente por especialistas vinculados a Westinghouse Electric Corporation.",wrong:"Las otras son empresas industriales estadounidenses, pero el material menciona solo a Westinghouse."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué sistema de normas de tiempos predeterminadas se utiliza en el curso?",opts:["MTM-1", "MTM-3", "Cronometraje británico", "MTM-2"],a:[3],exp:{ok:"El curso usa MTM-2.",wrong:"MTM-1 y MTM-3 son otros niveles de datos; el cronometraje británico no es una NTPD."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Cuáles son ventajas de las NTPD? Marcá todas las correctas.",opts:["Permiten establecer tiempos tipo antes de iniciar la producción", "Ayudan a estimar costos probables antes de ejecutar una operación", "Describen con total detalle cualquier movimiento en cualquier condición", "Son útiles en ciclos repetitivos de muy corta duración", "Requieren valorar el ritmo del operario en cada ciclo"],a:[0, 1, 3],exp:{ok:"Permiten fijar tiempos y estimar costos antes de producir y sirven para ciclos muy breves.",wrong:"Algunos sistemas no describen suficientemente ciertos movimientos y las NTPD prescinden de la valoración directa del ritmo."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Cuáles son desventajas de las NTPD según el material? Marcá todas las correctas.",opts:["No permiten estimar tiempos de tareas nuevas", "Exigen cronometrar cada ciclo real", "Su aplicación puede ser difícil si los movimientos se realizan en condiciones distintas de las normales", "Algunos sistemas no describen con suficiente detalle determinados movimientos"],a:[2, 3],exp:{ok:"Pueden ser insuficientes en detalle y difíciles de aplicar fuera de condiciones normales.",wrong:"Permiten estimar tareas nuevas y no requieren cronometrar cada ciclo."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Cómo se diferencian los niveles MTM-1, MTM-2 y MTM-3?",opts:["En el grado de detalle: MTM-1 fragmenta más los movimientos y MTM-3 los agrupa más", "En el tipo de distribución en planta en que se aplican", "En la unidad de tiempo: cada nivel usa una unidad distinta", "En el tipo de operario que se puede analizar con cada uno"],a:[0],exp:{ok:"Cuanto más detallado es el nivel, más fragmentados están los movimientos.",wrong:"Los tres niveles comparten la TMU y no se distinguen por operario ni por distribución."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué movimientos básicos analiza el MTM-1 según el material?",opts:["Manipular y poner", "Agarrar y poner", "Estirar el brazo, asir, soltar, trasladar y colocar", "Manipular, poner y aplicar presión"],a:[2],exp:{ok:"El MTM-1 usa un nivel de detalle mayor, con movimientos como estirar, asir, soltar, trasladar y colocar.",wrong:"Agarrar y poner son del MTM-2 y manipular y poner del MTM-3."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué categorías agrupadas emplea el MTM-3 según el esquema del material?",opts:["Asir y soltar", "Agarrar y poner", "Manipular y poner", "Estirar el brazo y asir"],a:[2],exp:{ok:"El MTM-3 usa agrupaciones más generales: manipular y poner.",wrong:"Estirar y asir son del MTM-1 y agarrar y poner del MTM-2."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿A cuánto equivale una TMU según el material?",opts:["1/28 de minuto", "1/60 de segundo", "1/100 de segundo", "1/28 de segundo"],a:[3],exp:{ok:"Una TMU representa 1/28 de segundo.",wrong:"Las otras fracciones o unidades no coinciden con el valor indicado."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"Una operación tiene 56 TMU. ¿Cuántos segundos representa según el material?",opts:["56 segundos", "0,5 segundos", "2 segundos", "28 segundos"],a:[2],exp:{ok:"Si 28 TMU equivalen a 1 segundo, 56 TMU equivalen a 2 segundos.",wrong:"56 TMU no son 56 s; 28 s equivaldría a 784 TMU y 0,5 s a 14 TMU."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Cuáles son las dos formas de aplicar las NTPD que describe el material?",opts:["Tomar observaciones aleatorias y estimar proporciones de tiempo", "Cronometrar cada elemento y valorar el ritmo del operario", "Aplicar tablas sin analizar los movimientos ni el método", "Observar directamente los movimientos (o analizar un video) o visualizar mentalmente los movimientos de un método nuevo"],a:[3],exp:{ok:"Se puede observar o grabar a un trabajador, o imaginar los movimientos de un método nuevo.",wrong:"Cronometrar y valorar o muestrear son otras técnicas; aplicar tablas sin analizar movimientos no es válido."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué códigos corresponden a la categoría «Agarrar» del MTM-2?",opts:["GA, GB y GC", "GW y PW", "PA, PB y PC", "R y A"],a:[0],exp:{ok:"Agarrar usa los códigos GA, GB y GC.",wrong:"PA, PB y PC son Poner; GW y PW son factores de peso; R es reasir y A es aplicar presión."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué categoría del MTM-2 corresponde a reajustar la posición de la mano sobre un objeto que ya está en la mano?",opts:["Agarrar (G)", "Poner (P)", "Reasir (R)", "Aplicar presión (A)"],a:[2],exp:{ok:"Reasir reajusta los dedos y la mano para cambiar el agarre; el objeto sigue en la mano.",wrong:"Agarrar es tomar el objeto, aplicar presión es ejercer fuerza y poner es llevarlo a una ubicación."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué variables se consideran para elegir entre PA, PB y PC?",opts:["La dureza del material, la posición del pie y el número de ciclos", "Si hacen falta movimientos de corrección, la distancia recorrida y el peso o resistencia del objeto", "El tamaño del objeto, la cantidad de operarios y el tipo de máquina", "La velocidad del operario, la distancia recorrida y la temperatura ambiente"],a:[1],exp:{ok:"La elección depende de la corrección, la distancia y el peso o resistencia.",wrong:"Las demás combinan variables que no intervienen en la selección."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"Un objeto pesa 5 kg por mano. Según la regla del material, ¿cuánto GW se asigna?",opts:["3 TMU", "0 TMU", "10 TMU", "5 TMU"],a:[3],exp:{ok:"Se asigna 1 TMU por kilogramo, incluidos los dos primeros: 5 kg = 5 TMU. Con menos de 2 kg por mano no se asigna GW.",wrong:"3 TMU resulta de descontar los dos primeros kilos, algo que la regla no hace; con menos de 2 kg por mano no hay GW, pero aquí el peso supera ese umbral."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué distingue a «Mover el pie» (F) de «Dar un paso» (S)?",opts:["F se usa con peso y S sin peso", "F es un movimiento de hasta 30 cm; S desplaza el tronco o mueve la pierna más de 30 cm", "F es hacia adelante y S es hacia atrás", "F desplaza el tronco; S mueve solo el pie"],a:[1],exp:{ok:"El límite entre ambas es el desplazamiento de 30 cm y si se desplaza el tronco.",wrong:"No se distinguen por el segmento que se mueve de forma exclusiva, por el peso ni por la dirección."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"Según el material, ¿cómo se clasifica arrodillarse sobre ambas rodillas?",opts:["F", "2B", "2S", "B"],a:[1],exp:{ok:"Arrodillarse sobre ambas rodillas se clasifica como 2B.",wrong:"B es una sola inclinación y levantarse; S y F son movimientos de pierna y pie."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué describe el movimiento «Hacer girar» (C)?",opts:["Mover un objeto con la mano siguiendo una trayectoria circular hasta completar una vuelta", "Reajustar la posición de la mano sobre el objeto ya tomado", "Ejercer fuerza muscular sobre un objeto sin desplazarlo", "Inclinar el tronco y volver a la posición vertical"],a:[0],exp:{ok:"C comienza con la mano sobre el objeto y termina tras una vuelta completa.",wrong:"Reajustar es reasir, ejercer fuerza es aplicar presión e inclinar el tronco es B."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué es «Aplicar presión» (A) en el MTM-2?",opts:["Ejercer fuerza muscular con una parte del cuerpo en contacto con el objeto, hasta dejar de ejercerla", "Reajustar los músculos de los dedos para cambiar el agarre", "Dominar el peso de un objeto al agarrarlo", "Llevar un objeto a una ubicación corrigiendo su posición"],a:[0],exp:{ok:"Comienza con una parte del cuerpo en contacto con el objeto y termina cuando deja de ejercer fuerza.",wrong:"Llevar un objeto es poner, dominar el peso es GW y cambiar el agarre es reasir."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Por qué la división en elementos para NTPD puede ser más detallada que en cronometraje?",opts:["Porque los elementos de NTPD duran más que los de cronometraje", "Porque las NTPD exigen valorar el ritmo en cada movimiento", "Porque no existe la dificultad práctica de cronometrar elementos muy breves: los tiempos salen de reglas predeterminadas", "Porque se mide cada elemento con un cronómetro de mayor precisión"],a:[2],exp:{ok:"Al asignarse tiempos predeterminados, no hace falta cronometrar elementos muy breves.",wrong:"Las NTPD no cronometran ni exigen valorar el ritmo, y los elementos no son más largos sino más breves."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué categoría corresponde a llevar un objeto hasta una ubicación?",opts:["Agarrar (G)", "Emplear los ojos (E)", "Dar un paso (S)", "Poner (P)"],a:[3],exp:{ok:"Poner comprende llevar el objeto a la ubicación requerida.",wrong:"Agarrar toma y domina el objeto; Poner se refiere a ubicarlo."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Cuándo comienza el movimiento Emplear los ojos (E) en la definición del material?",opts:["Cuando la mano suelta definitivamente el objeto", "Cuando las demás acciones deben detenerse para reconocer una característica", "Cuando el tronco empieza a inclinarse", "Cuando se ejerce presión sobre una pieza"],a:[1],exp:{ok:"E incluye enfocar o dirigir la vista y termina cuando pueden reanudarse las demás acciones.",wrong:"La categoría se relaciona con detener otras acciones para reconocer visualmente una característica."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué representa el complemento GW en MTM-2?",opts:["La fuerza necesaria para dominar el peso del objeto después de asirlo", "El acto de desplazar la vista a otro campo visual", "El movimiento del tronco para inclinarse", "El tiempo total de una jornada"],a:[0],exp:{ok:"GW se relaciona con la fuerza muscular para controlar el peso luego de agarrar.",wrong:"GW es un factor de peso vinculado a agarrar, no una acción visual ni una duración de jornada."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"¿Qué caracteriza a Inclinarse y levantarse (B)?",opts:["Una vuelta completa de la mano alrededor del objeto", "Un ajuste del agarre sin soltar el objeto", "Inclinar el tronco desde la vertical y volver a ella", "Mover el pie hasta 30 cm sin mover el tronco"],a:[2],exp:{ok:"B contempla el movimiento del tronco y el retorno a la posición vertical.",wrong:"Las otras descripciones corresponden a girar, reasir o mover el pie."}},
+{u:"Normas de tiempos predeterminadas (MTM)",q:"Para estimar el tiempo de una operación nueva antes de fabricar la primera unidad, ¿qué método es especialmente útil?",opts:["Normas de tiempos predeterminadas", "Muestreo posterior a varios turnos", "Cronometraje de ciclos que todavía no existen", "Registro de inventario terminado"],a:[0],exp:{ok:"Las NTPD permiten estimar tiempos a partir de los movimientos previstos antes de producir.",wrong:"El cronometraje requiere una ejecución observable y el muestreo requiere observaciones del proceso."}}
+];
+
+const FIX=/^(todas|ninguna|más de una|otra)/i;
+const $=s=>document.querySelector(s);
+const $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const TXT='\uFE0E';
+const QUIZ_ID='estudio-trabajo';
+const LS={
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:v}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
+  del(k){try{localStorage.removeItem(k)}catch(e){}}
+};
+let showExplanations=true, autoAdvance=true;
+let selectedUnits=new Set(), qCount=10, timer=null, S=null, cdText='', filter='all';
+const UNITS=[...new Set(QUESTIONS.map(q=>q.u))];
+selectedUnits=new Set(UNITS);
+
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function clearTimer(){if(timer){clearTimeout(timer);timer=null}}
+function show(id){$$('.screen').forEach(s=>s.classList.toggle('active',s.id===id));window.scrollTo(0,0);closeMenus()}
+
+/* THEME */
+function setTheme(t){document.documentElement.setAttribute('data-theme',t);updateThemeUI()}
+function curTheme(){return document.documentElement.getAttribute('data-theme')}
+function updateThemeUI(){
+  const dark=curTheme()==='dark';
+  $$('.themeBtn').forEach(b=>b.textContent=dark?'☀'+TXT:'☾'+TXT);
+  $('#themeItem').textContent=dark?'☀'+TXT+' Tema claro':'☾'+TXT+' Tema oscuro';
+}
+function toggleTheme(){setTheme(curTheme()==='dark'?'light':'dark')}
+
+/* TOGGLES */
+function syncToggleUI(){
+  const st={showExplanations,autoAdvance};
+  $$('[data-sw]').forEach(s=>s.classList.toggle('on',st[s.dataset.sw]));
+  $$('[data-toggle]').forEach(b=>b.setAttribute('aria-checked',st[b.dataset.toggle]));
+}
+function flip(k){
+  if(k==='showExplanations')showExplanations=!showExplanations;
+  else{autoAdvance=!autoAdvance;if(!autoAdvance){clearTimer();cdText='';const c=$('#cd');if(c)c.remove()}}
+  syncToggleUI();
+  if(S&&S.answered&&$('#quiz').classList.contains('active'))renderFeedback();
+}
+
+/* HOME */
+function renderHome(){
+  const list=$('#unitsList');list.innerHTML='';
+  UNITS.forEach(u=>{
+    const n=QUESTIONS.filter(q=>q.u===u).length;
+    const b=document.createElement('button');
+    b.className='unit'+(selectedUnits.has(u)?' on':'');
+    b.innerHTML='<span class="box">'+(selectedUnits.has(u)?'✓':'')+'</span><span>'+esc(u)+'</span><span class="n">'+n+' preg.</span>';
+    b.onclick=()=>{selectedUnits.has(u)?selectedUnits.delete(u):selectedUnits.add(u);renderHome()};
+    list.appendChild(b);
+  });
+  const all=selectedUnits.size===UNITS.length;
+  $('#allBtn').textContent=all?'✔'+TXT+' Deseleccionar todas':'✔'+TXT+' Seleccionar todas';
+  $('#startBtn').disabled=selectedUnits.size===0;
+  const c=$('#counts');c.innerHTML='<span class="lbl">Preguntas</span>';
+  [[10,'10'],[25,'25'],[50,'50'],[0,'Todas']].forEach(([v,l])=>{
+    const b=document.createElement('button');b.className='cnt'+(qCount===v?' on':'');b.textContent=l;
+    b.onclick=()=>{qCount=v;renderHome()};c.appendChild(b);
+  });
+  $('#cloudBtn').classList.toggle('on',Cloud.on());
+  syncToggleUI();
+}
+function goHome(){clearTimer();Track.discardIfEmpty();S=null;renderHome();show('home')}
+
+/* QUIZ */
+function prep(q){
+  const items=q.opts.map((t,i)=>({t,ok:q.a.includes(i)}));
+  const fixed=items.filter(o=>FIX.test(o.t));
+  const mov=shuffle(items.filter(o=>!FIX.test(o.t)));
+  return {u:q.u,q:q.q,exp:q.exp,opts:[...mov,...fixed],multi:q.a.length>1};
+}
+function startQuiz(){
+  clearTimer();
+  let pool=shuffle(QUESTIONS.filter(q=>selectedUnits.has(q.u)));
+  if(qCount>0)pool=pool.slice(0,qCount);
+  S={qs:pool.map(prep),i:0,score:0,answered:false,sel:new Set(),log:[]};
+  S.startedAt=Date.now();Track.begin(S.startedAt,S.qs.length);
+  show('quiz');renderQuestion();
+}
+function repeatQuiz(){clearTimer();startQuiz()}
+function confirmRestart(){clearTimer();startQuiz()}
+function setBar(mode){
+  const bar=$('#bar'),btn=$('#mainBtn');
+  if(!mode){bar.classList.remove('show');return}
+  bar.classList.add('show');
+  if(mode==='verify'){btn.textContent='Verificar';btn.disabled=S.sel.size===0;btn.onclick=evaluate}
+  else{btn.disabled=false;btn.textContent=S.i+1>=S.qs.length?'Ver resultados':'⏭'+TXT+' Siguiente';btn.onclick=nextQuestion}
+}
+function renderQuestion(){
+  clearTimer();cdText='';
+  const q=S.qs[S.i];S.answered=false;S.sel=new Set();
+  $('#progBar').style.width=(S.i/S.qs.length*100)+'%';
+  $('#counter').textContent=(S.i+1)+'/'+S.qs.length;
+  $('#score').textContent='★'+TXT+' '+S.score;
+  $('#uLabel').textContent=q.u;
+  $('#qText').textContent=q.q;
+  $('#mHint').textContent=q.multi?'Hay más de una respuesta correcta.':'';
+  const box=$('#opts');box.innerHTML='';
+  q.opts.forEach((o,i)=>{
+    const b=document.createElement('button');
+    b.className='opt'+(q.multi?' multi':'');b.dataset.i=i;
+    b.innerHTML='<span class="mark"></span><span class="t">'+esc(o.t)+'</span>';
+    b.onclick=()=>pick(i);box.appendChild(b);
+  });
+  $('#fbWrap').innerHTML='';
+  setBar(q.multi?'verify':null);
+  $('#scrollArea').scrollTop=0;
+}
+function pick(i){
+  if(S.answered)return;
+  const q=S.qs[S.i];
+  if(!q.multi){S.sel=new Set([i]);evaluate();return}
+  S.sel.has(i)?S.sel.delete(i):S.sel.add(i);
+  $$('#opts .opt').forEach(b=>b.classList.toggle('sel',S.sel.has(+b.dataset.i)));
+  $('#mainBtn').disabled=S.sel.size===0;
+}
+function evaluate(){
+  if(S.answered||S.sel.size===0)return;
+  const q=S.qs[S.i];S.answered=true;
+  const correct=q.opts.map((o,i)=>o.ok?i:-1).filter(i=>i>=0);
+  const ok=correct.length===S.sel.size&&correct.every(i=>S.sel.has(i));
+  if(ok)S.score++;
+  S.log.push({q,sel:[...S.sel].sort((a,b)=>a-b),ok});
+  Track.patch({score:S.score,answered:S.log.length});
+  $('#score').textContent='★'+TXT+' '+S.score;
+  $$('#opts .opt').forEach(b=>{
+    const i=+b.dataset.i;b.disabled=true;b.classList.remove('sel');
+    const c=q.opts[i].ok,s=S.sel.has(i);
+    if(c&&s)b.classList.add('ok');else if(c)b.classList.add('okfade');else if(s)b.classList.add('bad');
+  });
+  $('#progBar').style.width=((S.i+1)/S.qs.length*100)+'%';
+  renderFeedback();
+  setBar('next');
+  const sa=$('#scrollArea');sa.scrollTop=sa.scrollHeight;
+  if(ok&&autoAdvance)tick(2);
+}
+function renderFeedback(){
+  const q=S.qs[S.i],last=S.log[S.log.length-1];if(!last)return;
+  const wrap=$('#fbWrap');
+  if(last.ok){
+    wrap.innerHTML='<div class="fb ok"><b>✔'+TXT+' Correcto.</b><span class="cd" id="cd">'+esc(cdText)+'</span></div>';
+    if(!cdText){const c=$('#cd');if(c)c.style.display='none'}
+  }else{
+    const txt=q.opts.filter(o=>o.ok).map(o=>esc(o.t)).join(' · ');
+    wrap.innerHTML='<div class="fb bad"><b>✗ Incorrecto.</b> Respuesta correcta: '+txt+(showExplanations?'<div class="exp">'+esc(q.exp.wrong)+'</div>':'')+'</div>';
+  }
+  const sa=$('#scrollArea');sa.scrollTop=sa.scrollHeight;
+}
+function tick(n){
+  if(n===0){nextQuestion();return}
+  cdText+=(cdText?' ':'Avanzando en ')+n+'s…';
+  const c=$('#cd');if(c){c.style.display='block';c.textContent=cdText}
+  timer=setTimeout(()=>tick(n-1),1000);
+}
+function nextQuestion(){
+  clearTimer();
+  if(S.i+1>=S.qs.length){showResults();return}
+  S.i++;renderQuestion();
+}
+
+/* RESULTS */
+function showResults(){
+  clearTimer();
+  const pct=Math.round(S.score/S.qs.length*100);
+  $('#final').textContent=pct+'% de respuestas correctas';
+  Track.finish();
+  filter='all';setTabs();renderReview();
+  $('#revBox').open=false;$('#tblBox').open=false;
+  show('results');
+}
+function setTabs(){
+  const ok=S.log.filter(l=>l.ok).length,bad=S.log.length-ok;
+  const lab={all:'Todas',ok:ok+(ok===1?' correcta':' correctas'),bad:bad+(bad===1?' incorrecta':' incorrectas')};
+  $$('#tabs .tab').forEach(t=>{t.textContent=lab[t.dataset.f];t.classList.toggle('on',t.dataset.f===filter)});
+}
+function renderReview(){
+  const box=$('#revList');box.innerHTML='';
+  S.log.filter(l=>filter==='all'||(filter==='ok'?l.ok:!l.ok)).forEach(l=>{
+    const d=document.createElement('div');d.className='card rev'+(l.ok?'':' bad');
+    let h='<div class="ulabel">'+esc(l.q.u)+'</div><div class="rq">'+esc(l.q.q)+'</div>';
+    l.q.opts.forEach((o,i)=>{
+      const s=l.sel.includes(i);
+      if(s)h+='<div class="ro '+(o.ok?'ok':'bad')+'"><span>'+(o.ok?'✔'+TXT:'✗')+'</span><span>'+esc(o.t)+'</span></div>';
+      else if(o.ok&&!l.ok)h+='<div class="ro miss"><span>✔'+TXT+'</span><span>'+esc(o.t)+' (correcta)</span></div>';
+    });
+    if(showExplanations)h+='<div class="rx">'+esc(l.ok?l.q.exp.ok:l.q.exp.wrong)+'</div>';
+    d.innerHTML=h;box.appendChild(d);
+  });
+}
+
+/* NUBE: Firebase Realtime Database por REST (URL + código, sin SDK) */
+const CLOUD_URL='https://esttrabp2-default-rtdb.firebaseio.com';
+const CLOUD_CODE='general'; /* código compartido: todos los dispositivos ven la misma tabla */
+const Cloud={
+  cfg:null,poll:null,
+  load(){
+    let sv=null;try{sv=JSON.parse(LS.get('quizCloud','null'))}catch(e){}
+    if(sv&&sv.off){this.cfg=null;return}
+    const code=(sv&&sv.code)||CLOUD_CODE;
+    this.cfg={url:CLOUD_URL,code,key:this.key(code)};
+  },
+  on(){return !!(this.cfg&&this.cfg.url&&this.cfg.key)},
+  norm(u){
+    u=String(u||'').trim();if(!u)return '';
+    if(!/^https?:\/\//i.test(u))u='https://'+u;
+    u=u.replace(/\.json.*$/i,'').replace(/\/+$/,'');
+    try{const x=new URL(u);if(x.protocol!=='https:')return '';return x.origin}catch(e){return ''}
+  },
+  key(c){return String(c||'').trim().replace(/[.$#\[\]\/]/g,'_')},
+  url(path,cfg){cfg=cfg||this.cfg;const i=path.indexOf('?'),p=i<0?path:path.slice(0,i),qs=i<0?'':path.slice(i);return cfg.url+'/scores/'+encodeURIComponent(cfg.key+'__'+QUIZ_ID)+p+'.json'+qs},
+  async call(method,path,body,cfg){
+    const opt={method};
+    if(body!==undefined){opt.headers={'Content-Type':'application/json'};opt.body=JSON.stringify(body)}
+    const r=await fetch(this.url(path,cfg),opt);
+    if(!r.ok){const e=new Error('HTTP '+r.status);e.status=r.status;throw e}
+    return r.json();
+  }
+};
+
+/* REGISTRO DE PUNTAJES */
+const Track={
+  rec:null,key:null,mode:'local',name:'',items:[],q:Promise.resolve(),lastSync:null,err:false,poll:null,
+  lget(){try{return JSON.parse(LS.get('quizScores_'+QUIZ_ID,'[]'))}catch(e){return[]}},
+  lset(a){LS.set('quizScores_'+QUIZ_ID,JSON.stringify(a.slice(-300)))},
+  init(){this.name=LS.get('quizName','');Cloud.load();$('#cloudBtn').classList.toggle('on',Cloud.on());this.startPoll();this.refresh()},
+  startPoll(){
+    clearInterval(this.poll);this.poll=null;
+    if(Cloud.on())this.poll=setInterval(()=>{if(!document.hidden)this.refresh()},5000);
+  },
+  async refresh(){
+    if(Cloud.on()){
+      try{
+        const d=await Cloud.call('GET','');
+        this.items=d?Object.entries(d).filter(([k,v])=>v&&typeof v==='object').map(([k,v])=>Object.assign({key:k},v)):[];
+        this.lastSync=new Date();this.err=false;
+      }catch(e){this.err=true}
+    }else{this.items=this.lget()}
+    this.renderAll();
+  },
+  begin(startedAt,total){
+    this.discardIfEmpty();
+    this.rec={name:this.name,startedAt,score:0,answered:0,total,finished:false,updatedAt:Date.now()};
+    this.mode=Cloud.on()?'cloud':'local';
+    this.key='q'+startedAt.toString(36)+Math.random().toString(36).slice(2,6);
+    this.save();
+  },
+  patch(p){if(!this.rec)return;Object.assign(this.rec,p,{updatedAt:Date.now()});this.save()},
+  finish(){this.patch({score:S.score,answered:S.log.length,finished:true,finishedAt:Date.now()})},
+  save(){
+    const rec=Object.assign({},this.rec),key=this.key;
+    if(this.mode==='cloud'){
+      this.q=this.q.then(()=>Cloud.call('PUT','/'+key,rec)).then(()=>{this.err=false;return this.refresh()}).catch(()=>{this.err=true;this.renderAll()});
+    }else{
+      const a=this.lget(),i=a.findIndex(x=>x.key===key),it=Object.assign({key},rec);
+      if(i>=0)a[i]=it;else a.push(it);
+      this.lset(a);this.items=a;this.renderAll();
+    }
+  },
+  discardIfEmpty(){
+    const r=this.rec,key=this.key;
+    if(!r||r.answered>0||r.finished)return;
+    if(this.mode==='cloud')this.q=this.q.then(()=>Cloud.call('DELETE','/'+key)).catch(()=>{});
+    else{const a=this.lget().filter(x=>x.key!==key);this.lset(a);this.items=a}
+    this.rec=null;this.key=null;
+  },
+  top(){
+    return this.items.filter(x=>x.finished&&x.total>0)
+      .sort((a,b)=>(b.score/b.total)-(a.score/a.total)||b.total-a.total||(a.startedAt||0)-(b.startedAt||0)).slice(0,10);
+  },
+  tableHTML(){
+    const fmt=o=>new Date(o.t).toLocaleString('es-AR',o.o);
+    let st;
+    if(Cloud.on())st=this.err?'No se pudo sincronizar. Reintentando…':'Sincronizado con la nube'+(this.lastSync?' · '+this.lastSync.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}):'')+'.';
+    else st='Solo en este dispositivo. Tocá el ícono de nube para volver a conectar.';
+    let h='<div class="tstat">'+esc(st)+'</div>';
+    const top=this.top();
+    if(!top.length)return h+'<div class="tstat">Todavía no hay puntajes registrados.</div>';
+    h+='<div class="tlist">';
+    top.forEach((it,i)=>{
+      const when=new Date(it.startedAt).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',hour12:false});
+      const pct=Math.round(it.score/it.total*100);
+      h+='<div class="trk'+(it.key===this.key?' me':'')+'"><span class="rk">'+(i+1)+'</span><div class="tmid"><div class="tn">'+esc(it.name||'Sin nombre')+'</div><div class="td">'+esc(when)+'</div></div><div class="ts badge tx">★'+TXT+' '+esc(it.score)+'/'+esc(it.total)+' · '+pct+'%</div></div>';
+    });
+    return h+'</div>';
+  },
+  renderAll(){
+    const h=this.tableHTML();
+    ['#resTable','#qzTable'].forEach(s=>{const el=$(s);if(el)el.innerHTML=h});
+  }
+};
+
+/* COLORES: dos colores principales (acento y base), con historial de 3 combinaciones */
+const Pal={
+  DEF:{a:'#4737ff',b:'#202030'},cur:null,hist:[],
+  hx(c){return [1,3,5].map(i=>parseInt(c.slice(i,i+2),16))},
+  mix(a,b,t){const A=this.hx(a),B=this.hx(b);return '#'+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,'0')).join('')},
+  lum(c){const[r,g,b]=this.hx(c);return .299*r+.587*g+.114*b},
+  hex(c){c=String(c||'').toLowerCase();return /^#[0-9a-f]{6}$/.test(c)?c:null},
+  fix(p){const a=p&&this.hex(p.a),b=p&&this.hex(p.b);return a&&b?{a,b}:null},
+  same(x,y){return !!x&&!!y&&x.a===y.a&&x.b===y.b},
+  dark(c,max){let i=0;while(this.lum(c)>max&&i<40){c=this.mix(c,'#000000',.1);i++}return c},
+  css(p){
+    const W='#ffffff',K='#000000',A=p.a,B=this.dark(p.b,80),m=(x,y,t)=>this.mix(x,y,t);
+    const onA=this.lum(A)>160?B:W,aInk=this.dark(A,150),aSoftD=m(W,A,.45);
+    return 'html[data-theme="light"]{--surface:'+m(W,A,.06)+';--surface-fixed:'+m(W,A,.135)+';--border:'+B+';--text:'+B+';--text-muted:'+m(B,W,.28)+';--accent:'+A+';--on-accent:'+onA+';--accent-soft:'+m(W,A,.25)+';--accent-ink:'+aInk+';--ink:'+B+'}'
+      +'html[data-theme="dark"]{--bg:'+m(B,K,.5)+';--surface:'+B+';--surface-fixed:'+m(B,K,.25)+';--border:'+m(B,W,.28)+';--text:'+W+';--text-muted:'+m(W,A,.25)+';--accent:'+A+';--on-accent:'+onA+';--accent-soft:'+aSoftD+';--accent-ink:'+aSoftD+';--ink:'+B+'}';
+  },
+  apply(p){
+    let e=document.getElementById('palst');
+    if(!p){if(e)e.remove();return}
+    if(!e){e=document.createElement('style');e.id='palst';document.head.appendChild(e)}
+    e.textContent=this.css(p);
+  },
+  init(){
+    try{this.cur=this.fix(JSON.parse(LS.get('quizPal','null')))}catch(e){this.cur=null}
+    try{this.hist=(JSON.parse(LS.get('quizPalH','[]'))||[]).map(x=>this.fix(x)).filter(Boolean).slice(0,3)}catch(e){this.hist=[]}
+    this.apply(this.cur);
+  },
+  save(){if(this.cur)LS.set('quizPal',JSON.stringify(this.cur));else LS.del('quizPal');LS.set('quizPalH',JSON.stringify(this.hist))},
+  status(t){const el=$('#palStatus');if(el)el.textContent=t||''},
+  open(){
+    const p=this.cur||this.DEF;
+    $('#palA').value=p.a;$('#palB').value=p.b;
+    this.status('');this.render();openOv('#palOv');
+  },
+  set(p){
+    p=this.fix(p);if(!p)return;
+    this.cur=p;this.hist=[p,...this.hist.filter(x=>!this.same(x,p))].slice(0,3);
+    this.save();this.apply(p);
+    $('#palA').value=p.a;$('#palB').value=p.b;
+    this.status('Colores aplicados.');this.render();
+  },
+  reset(){
+    this.cur=null;this.save();this.apply(null);
+    $('#palA').value=this.DEF.a;$('#palB').value=this.DEF.b;
+    this.status('Colores originales restaurados.');this.render();
+  },
+  revert(){this.apply(this.cur)},
+  render(){
+    const box=$('#palHist');if(!box)return;
+    if(!this.hist.length){box.innerHTML='<div class="tstat">Todavía no aplicaste ninguna.</div>';return}
+    box.innerHTML='<div class="pH">'+this.hist.map((c,i)=>'<button class="pw'+(this.same(c,this.cur)?' cur':'')+'" data-i="'+i+'" aria-label="Usar combinación '+c.a+' y '+c.b+'"><i style="background:'+c.a+'"></i><i style="background:'+c.b+'"></i></button>').join('')+'</div>';
+    $$('#palHist .pw').forEach(b=>b.onclick=()=>this.set(this.hist[+b.dataset.i]));
+  }
+};
+
+/* MENUS Y MODALES */
+function closeMenus(){$('#setMenu').classList.remove('open');$('#mainMenu').classList.remove('open')}
+function toggleMenu(id){const m=$(id),was=m.classList.contains('open');closeMenus();if(!was)m.classList.add('open')}
+function openOv(id){closeMenus();$(id).classList.add('open')}
+function closeAll(){$$('.ov').forEach(o=>o.classList.remove('open'));pending=null;Pal.revert()}
+let pending=null;
+function ask(msg,fn){pending=fn;$('#modalMsg').textContent=msg;openOv('#ov')}
+
+/* NOMBRE ANTES DE COMENZAR */
+function openName(){
+  const inp=$('#nameIn');inp.value=Track.name;
+  $('#nameOk').disabled=!inp.value.trim();
+  openOv('#nameOv');setTimeout(()=>inp.focus(),50);
+}
+function confirmName(){
+  const v=$('#nameIn').value.trim().slice(0,40);if(!v)return;
+  Track.name=v;LS.set('quizName',v);closeAll();startQuiz();
+}
+
+/* PANEL «GUARDAR EN LA NUBE» */
+function cloudStatus(t){$('#cloudStatus').textContent=t}
+function openCloud(){
+  $('#cloudUrl').value=CLOUD_URL;
+  $('#cloudCode').value=Cloud.cfg?Cloud.cfg.code:CLOUD_CODE;
+  $('#cloudOff').style.display=Cloud.on()?'':'none';
+  cloudStatus(Cloud.on()?'Conectado. Tus puntajes se sincronizan con este código.':'Desconectado. Los puntajes se guardan solo en este dispositivo.');
+  openOv('#cloudOv');
+}
+async function connectCloud(){
+  const url=CLOUD_URL,code=$('#cloudCode').value.trim(),key=Cloud.key(code);
+  if(!url){cloudStatus('Pegá una URL válida que empiece con https://');return}
+  if(!key){cloudStatus('Elegí un código.');return}
+  const cfg={url,code,key};
+  cloudStatus('Conectando…');$('#cloudOk').disabled=true;
+  try{
+    await Cloud.call('GET','?shallow=true',undefined,cfg);
+    Cloud.cfg=cfg;LS.set('quizCloud',JSON.stringify(cfg));
+    Track.startPoll();await Track.refresh();
+    $('#cloudOff').style.display='';$('#cloudBtn').classList.add('on');
+    cloudStatus('Conectado. Tus puntajes se sincronizan con este código.');
+  }catch(e){
+    cloudStatus(e.status===401||e.status===403?'Permiso denegado. Revisá las reglas de la base de datos.':e.status===404?'No se encontró la base. Revisá la URL.':'No se pudo conectar. Revisá la URL y tu conexión.');
+  }
+  $('#cloudOk').disabled=false;
+}
+function disconnectCloud(){
+  Cloud.cfg=null;LS.set('quizCloud',JSON.stringify({off:true}));Track.startPoll();Track.refresh();
+  $('#cloudOff').style.display='none';$('#cloudBtn').classList.remove('on');
+  cloudStatus('Desconectado. Los puntajes se guardan solo en este dispositivo.');
+}
+
+/* EVENTS */
+$('#allBtn').onclick=()=>{selectedUnits=selectedUnits.size===UNITS.length?new Set():new Set(UNITS);renderHome()};
+$('#startBtn').onclick=openName;
+$$('[data-toggle]').forEach(b=>b.onclick=e=>{e.stopPropagation();flip(b.dataset.toggle)});
+$$('.themeBtn').forEach(b=>b.onclick=toggleTheme);
+$('#themeItem').onclick=e=>{e.stopPropagation();toggleTheme()};
+$('#setBtn').onclick=e=>{e.stopPropagation();toggleMenu('#setMenu')};
+$('#menuBtn').onclick=e=>{e.stopPropagation();toggleMenu('#mainMenu')};
+$('#setMenu').onclick=e=>e.stopPropagation();
+$('#mainMenu').onclick=e=>e.stopPropagation();
+document.addEventListener('click',closeMenus);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenus();closeAll()}});
+function openScores(){openOv('#scoreOv');Track.renderAll();Track.refresh()}
+$('#scoresItem').onclick=openScores;
+$('#rankBtn').onclick=openScores;
+$('#scoreClose').onclick=closeAll;
+$('#restartItem').onclick=()=>ask('¿Reiniciar el cuestionario? Se perderá el progreso y el puntaje actual.',confirmRestart);
+$('#homeItem').onclick=()=>ask('¿Volver al menú inicial? Se cancelará el quiz en curso.',()=>{clearTimer();goHome()});
+$('#mCancel').onclick=closeAll;
+$('#mOk').onclick=()=>{const f=pending;closeAll();clearTimer();if(f)f()};
+$('#nameIn').addEventListener('input',e=>{$('#nameOk').disabled=!e.target.value.trim()});
+$('#nameIn').addEventListener('keydown',e=>{if(e.key==='Enter')confirmName()});
+$('#nameOk').onclick=confirmName;
+$('#nameCancel').onclick=closeAll;
+$('#cloudBtn').onclick=openCloud;
+$$('.palOpen').forEach(b=>b.onclick=()=>Pal.open());
+$('#palClose').onclick=closeAll;
+$('#palOk').onclick=()=>Pal.set({a:$('#palA').value,b:$('#palB').value});
+$('#palReset').onclick=()=>Pal.reset();
+['#palA','#palB'].forEach(s=>$(s).addEventListener('input',()=>Pal.apply(Pal.fix({a:$('#palA').value,b:$('#palB').value}))));
+$('#cloudOk').onclick=connectCloud;
+$('#cloudOff').onclick=disconnectCloud;
+$('#cloudClose').onclick=closeAll;
+$$('.ov').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeAll()}));
+$('#repeatBtn').onclick=repeatQuiz;
+$('#newBtn').onclick=goHome;
+$$('#tabs .tab').forEach(t=>t.onclick=()=>{filter=t.dataset.f;setTabs();renderReview()});
+$('#tblBox').addEventListener('toggle',()=>{if($('#tblBox').open){Track.renderAll();Track.refresh()}});
+
+/* INIT */
+setTheme(window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+Pal.init();
+Track.init();
+renderHome();
+</script>
+</body>
+</html>
